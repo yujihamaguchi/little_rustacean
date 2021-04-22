@@ -26,7 +26,7 @@ mod tests {
     #[test]
     fn test_my_sum() {
         assert_eq!(0, my_sum(&vec![]));
-        assert_eq!(1, my_sum(&vec![1]));        
+        assert_eq!(1, my_sum(&vec![1]));
         assert_eq!(6, my_sum(&vec![1, 2, 3]));
     }
     #[test]
