@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 // 0010. Write a function named my_sum summing elements of list.
 #[allow(dead_code)]
 fn my_sum(ns: &[usize]) -> usize {
@@ -11,7 +13,7 @@ fn my_sum(ns: &[usize]) -> usize {
 }
 
 // https://doc.rust-jp.rs/book-ja/ch08-03-hash-maps.html
-// 0020. Write a function named my_mean calcurating the average of elements of list.
+// 0020. Write a function named my_mean calculating the average of elements of list.
 #[allow(dead_code)]
 fn my_mean(ns: &[usize]) -> Option<usize> {
     match ns.len() {
@@ -20,7 +22,7 @@ fn my_mean(ns: &[usize]) -> Option<usize> {
     }
 }
 
-// 0030. Write a function nemed my_median calcurating the median of elements of list.
+// 0030. Write a function nemed my_median calculating the median of elements of list.
 #[allow(dead_code)]
 fn my_median(ns: &mut [usize]) -> Option<usize> {
     match ns.len() {
@@ -33,6 +35,22 @@ fn my_median(ns: &mut [usize]) -> Option<usize> {
     }
 }
 
+// 0040. Write a function named my_mode calclating the mode of elements of list.
+#[allow(dead_code)]
+fn my_mode(ns: &[usize]) -> Option<usize> {
+    if ns.is_empty() {
+        None
+    } else {
+        let mut occurrences: HashMap<usize, usize> = HashMap::new();
+        for &n in ns {
+            *occurrences.entry(n).or_insert(0) += 1;
+        }
+        match occurrences.iter().max_by(|x, y| x.1.cmp(&y.1)) {
+            Some((n, _)) => Some(*n),
+            None => None,
+        }
+    }
+}
 // Genbade yakudatsu ch.2
 
 #[cfg(test)]
@@ -51,9 +69,15 @@ mod tests {
         assert_eq!(Some(2), my_mean(&vec![1, 2, 3]));
     }
     #[test]
-    fn test_median() {
+    fn test_my_median() {
         assert_eq!(None, my_median(&mut vec![]));
         assert_eq!(Some(1), my_median(&mut vec![1]));
         assert_eq!(Some(2), my_median(&mut vec![3, 1, 2]));
+    }
+    #[test]
+    fn test_my_mode() {
+        assert_eq!(None, my_mode(&vec![]));
+        assert_eq!(Some(1), my_mode(&vec![1]));
+        assert_eq!(Some(2), my_mode(&vec![1, 2, 3, 2, 3, 2]));
     }
 }
