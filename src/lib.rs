@@ -59,8 +59,8 @@ fn to_pig_latin(s: &str) -> String {
         None => s.to_string(),
         Some(&c_byte) => {
             match c_byte as char {
-                'x' => "bar".to_string(),
-                _ => format!("{}-hay", s)
+                'b'..='d' | 'f'..='h' | 'j'..='n' | 'p'..='t' | 'v'..='z' => format!("{}-{}ay", &s[1..], c_byte as char),
+                _ => format!("{}-hay", s),
             }
         }
     }
@@ -97,7 +97,8 @@ mod tests {
     }
     #[test]
     fn test_to_pig_latin() {
-        // assert_eq!("irst-fay", to_pig_latin("first"));
+        assert_eq!("irst-fay", to_pig_latin("first"));
+        assert_eq!("econd-say", to_pig_latin("second"));
         assert_eq!("apple-hay", to_pig_latin("apple"));
     }
 }
