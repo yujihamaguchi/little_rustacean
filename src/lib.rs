@@ -59,8 +59,8 @@ fn to_pig_latin(s: &str) -> String {
         None => s.to_string(),
         Some(&c_byte) => {
             match c_byte as char {
-                'b'..='d' | 'f'..='h' | 'j'..='n' | 'p'..='t' | 'v'..='z' => format!("{}-{}ay", &s[1..], c_byte as char),
-                _ => format!("{}-hay", s),
+                'a' | 'e' | 'i' | 'o' | 'u' => format!("{}-hay", s),
+                _ => format!("{}-{}ay", &s[1..], c_byte as char),
             }
         }
     }
