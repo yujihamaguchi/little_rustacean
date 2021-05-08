@@ -1,6 +1,6 @@
 use std::{collections::HashMap};
 
-// 0010. Write a function named my_sum summing elements of list.
+// 0010. Write a function named `my_sum` summing list of usize elements.
 #[allow(dead_code)]
 fn my_sum(ns: &[usize]) -> usize {
     fn my_sum(acc: usize, ns: &[usize]) -> usize {
@@ -12,8 +12,8 @@ fn my_sum(ns: &[usize]) -> usize {
     my_sum(0, ns)
 }
 
-// https://doc.rust-jp.rs/book-ja/ch08-03-hash-maps.html
-// 0020. Write a function named my_mean calculating the average of elements of list.
+// refer: https://doc.rust-jp.rs/book-ja/ch08-03-hash-maps.html
+// 0020. Write a function named my_mean calculating the average of list of usize elements.
 #[allow(dead_code)]
 fn my_mean(ns: &[usize]) -> Option<usize> {
     match ns.len() {
@@ -97,6 +97,7 @@ mod tests {
     }
     #[test]
     fn test_to_pig_latin() {
+        assert_eq!("", to_pig_latin(""));
         assert_eq!("irst-fay", to_pig_latin("first"));
         assert_eq!("econd-say", to_pig_latin("second"));
         assert_eq!("apple-hay", to_pig_latin("apple"));
