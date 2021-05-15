@@ -52,7 +52,7 @@ fn my_mode(ns: &[usize]) -> Option<usize> {
 
 // 0050. Write a function named to_pig_latin converting word to Pig Latin word.
 #[allow(dead_code)]
-fn to_pig_latin(s: &str) -> String {
+fn pig_latin_from(s: &str) -> String {
     match s.as_bytes().first() {
         None => s.to_string(),
         Some(&c_byte) => match c_byte as char {
@@ -92,10 +92,10 @@ mod tests {
         assert_eq!(Some(2), my_mode(&vec![1, 2, 3, 2, 3, 2]));
     }
     #[test]
-    fn test_to_pig_latin() {
-        assert_eq!("", to_pig_latin(""));
-        assert_eq!("irst-fay", to_pig_latin("first"));
-        assert_eq!("econd-say", to_pig_latin("second"));
-        assert_eq!("apple-hay", to_pig_latin("apple"));
+    fn test_pig_latin_from() {
+        assert_eq!("", pig_latin_from(""));
+        assert_eq!("apple-hay", pig_latin_from("apple"));        
+        assert_eq!("irst-fay", pig_latin_from("first"));
+        assert_eq!("econd-say", pig_latin_from("second"));
     }
 }
