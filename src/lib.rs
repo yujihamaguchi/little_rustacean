@@ -1,4 +1,4 @@
-use std::{collections::HashMap};
+use std::collections::HashMap;
 
 // 0010. Write a function named `my_sum` summing list of usize elements.
 #[allow(dead_code)]
@@ -31,7 +31,7 @@ fn my_median(ns: &mut [usize]) -> Option<usize> {
             let index = length / 2;
             ns.sort();
             Some(ns[index])
-        },
+        }
     }
 }
 
@@ -41,12 +41,12 @@ fn my_mode(ns: &[usize]) -> Option<usize> {
     if ns.is_empty() {
         None
     } else {
-        let mut occurrences: HashMap<usize, usize> = HashMap::new();
+        let mut occurrences = HashMap::new();
         for &n in ns {
             *occurrences.entry(n).or_insert(0) += 1;
         }
-        match occurrences.iter().max_by(|x, y| x.1.cmp(&y.1)) {
-            Some((n, _)) => Some(*n),
+        match occurrences.iter().max_by(|(_, v1), (_, v2)| v1.cmp(v2)) {
+            Some((&k, _)) => Some(k),
             None => None,
         }
     }
@@ -57,12 +57,10 @@ fn my_mode(ns: &[usize]) -> Option<usize> {
 fn to_pig_latin(s: &str) -> String {
     match s.as_bytes().first() {
         None => s.to_string(),
-        Some(&c_byte) => {
-            match c_byte as char {
-                'a' | 'e' | 'i' | 'o' | 'u' => format!("{}-hay", s),
-                _ => format!("{}-{}ay", &s[1..], c_byte as char),
-            }
-        }
+        Some(&c_byte) => match c_byte as char {
+            'a' | 'e' | 'i' | 'o' | 'u' => format!("{}-hay", s),
+            _ => format!("{}-{}ay", &s[1..], c_byte as char),
+        },
     }
 }
 
