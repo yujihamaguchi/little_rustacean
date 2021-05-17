@@ -12,7 +12,6 @@ fn my_sum(ns: &[usize]) -> usize {
     my_sum(0, ns)
 }
 
-// refer: https://doc.rust-jp.rs/book-ja/ch08-03-hash-maps.html
 // 0020. Write a function named my_mean calculating the average of list of usize elements.
 #[allow(dead_code)]
 fn my_mean(ns: &[usize]) -> Option<usize> {
@@ -53,15 +52,14 @@ fn my_mode(ns: &[usize]) -> Option<usize> {
 // 0050. Write a function named to_pig_latin converting word to Pig Latin word.
 #[allow(dead_code)]
 fn pig_latin_from(s: &str) -> String {
-    match s.as_bytes().first() {
+    match s.chars().nth(0) {
+        Some('a') | Some('e') | Some('i') | Some('u') | Some('o') => format!("{}-hay", s),
+        Some(c) => format!("{}-{}ay", s.chars().skip(1).collect::<String>() , c),
         None => s.to_string(),
-        Some(&c_byte) => match c_byte as char {
-            'a' | 'e' | 'i' | 'o' | 'u' => format!("{}-hay", s),
-            _ => format!("{}-{}ay", &s[1..], c_byte as char),
-        },
     }
 }
 
+// refer: https://doc.rust-jp.rs/book-ja/ch08-03-hash-maps.html
 // Genbade yakudatsu ch.2
 
 #[cfg(test)]
@@ -97,5 +95,9 @@ mod tests {
         assert_eq!("apple-hay", pig_latin_from("apple"));        
         assert_eq!("irst-fay", pig_latin_from("first"));
         assert_eq!("econd-say", pig_latin_from("second"));
+        assert_eq!("egg-hay", pig_latin_from("egg"));
+        assert_eq!("issue-hay", pig_latin_from("issue"));
+        assert_eq!("useless-hay", pig_latin_from("useless"));
+        assert_eq!("out-hay", pig_latin_from("out"));
     }
 }
