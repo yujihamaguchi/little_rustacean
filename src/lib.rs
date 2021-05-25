@@ -12,7 +12,7 @@ fn my_sum(ns: &[usize]) -> usize {
     my_sum(0, ns)
 }
 
-// 0020. Write a function named my_mean calculating the average of list of usize elements.
+// 0020. Write a function named 'my_mean' to calculate an average for list of some numbers.
 #[allow(dead_code)]
 fn my_mean(ns: &[usize]) -> Option<usize> {
     match ns.len() {
@@ -21,7 +21,21 @@ fn my_mean(ns: &[usize]) -> Option<usize> {
     }
 }
 
-// 0030. Write a function nemed my_median calculating the median of elements of list.
+// 0025. Write a function named 'my_sort' to sort list of some numbers.
+#[allow(dead_code)]
+fn my_sort(ns: &[usize]) -> Vec<usize> {
+    match ns {
+        [] => vec![],
+        [n, ns @ ..] => {
+            let v = ns.to_vec();
+            let lt: Vec<usize> = v.iter().filter(|&m| m < n).cloned().collect();
+            let ge: Vec<usize> = v.iter().filter(|&m| n <= m).cloned().collect();
+            [my_sort(&lt), vec![*n], my_sort(&ge)].concat()
+        },
+    }
+}
+
+// 0030. Write a function nemed 'my_median' to calculate a median for list of some numbers.
 #[allow(dead_code)]
 fn my_median(ns: &mut [usize]) -> Option<usize> {
     match ns.len() {
@@ -76,6 +90,12 @@ mod tests {
         assert_eq!(None, my_mean(&vec![]));
         assert_eq!(Some(2), my_mean(&vec![2]));
         assert_eq!(Some(2), my_mean(&vec![1, 2, 3]));
+    }
+    #[test]
+    fn test_my_sort() {
+        assert_eq!(vec![] as Vec<usize>, my_sort(&vec![]));
+        assert_eq!(vec![1], my_sort(&vec![1]));
+        assert_eq!(vec![1, 2, 3], my_sort(&vec![2, 1, 3]));
     }
     #[test]
     fn test_my_median() {
