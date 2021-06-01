@@ -40,11 +40,10 @@ fn my_sort(ns: &[usize]) -> Vec<usize> {
 fn my_median(ns: &mut [usize]) -> Option<usize> {
     match ns.len() {
         0 => None,
-        length => {
-            let index = length / 2;
+        n => {
             ns.sort();
-            Some(ns[index])
-        }
+            Some(ns[n / 2])
+        },
     }
 }
 
