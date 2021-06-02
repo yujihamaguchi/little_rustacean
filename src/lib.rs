@@ -31,7 +31,7 @@ fn my_sort(ns: &[usize]) -> Vec<usize> {
             let lt: Vec<usize> = v.iter().filter(|&m| m < n).cloned().collect();
             let ge: Vec<usize> = v.iter().filter(|&m| n <= m).cloned().collect();
             [my_sort(&lt), vec![*n], my_sort(&ge)].concat()
-        },
+        }
     }
 }
 
@@ -43,7 +43,7 @@ fn my_median(ns: &mut [usize]) -> Option<usize> {
         n => {
             ns.sort();
             Some(ns[n / 2])
-        },
+        }
     }
 }
 
@@ -67,12 +67,49 @@ fn my_mode(ns: &[usize]) -> Option<usize> {
 fn pig_latin_from(s: &str) -> String {
     match s.chars().nth(0) {
         Some('a') | Some('e') | Some('i') | Some('u') | Some('o') => format!("{}-hay", s),
-        Some(c) => format!("{}-{}ay", s.chars().skip(1).collect::<String>() , c),
+        Some(c) => format!("{}-{}ay", s.chars().skip(1).collect::<String>(), c),
         None => s.to_string(),
     }
 }
 
-// refer: https://doc.rust-jp.rs/book-ja/ch08-03-hash-maps.html
+/*
+// ハッシュマップとベクタを使用して、ユーザに会社の部署に雇用者の名前を追加させられるテキストインターフェイスを作ってください。
+// 例えば、"Add Sally to Engineering"(開発部門にサリーを追加)や"Add Amir to Sales"(販売部門にアミールを追加)などです。
+// それからユーザに、ある部署にいる人間の一覧や部署ごとにアルファベット順で並べ替えられた会社の全人間の一覧を扱わせてあげてください。
+
+use std::{collections::HashMap, io};
+
+fn main() {
+    let mut depts: HashMap<String, Vec<String>> = HashMap::new();
+    loop {
+        println!("Command?");
+
+        let mut command = String::new();
+        io::stdin()
+            .read_line(&mut command)
+            .expect("Failed to read line!");
+
+        match command.trim().split(' ').collect::<Vec<_>>().as_slice() {
+            ["add", name, "to", dept] => {
+                depts
+                    .entry(dept.to_string())
+                    .or_insert(Vec::new())
+                    .push(name.to_string());
+            }
+            ["list"] => list(&depts),
+            ["list", target_dept] => list(
+                &depts
+                    .iter()
+                    .filter(|(dept, _)| dept == target_dept)
+                    .map(|(k, v)| (k.clone(), v.clone()))
+                    .collect::<HashMap<_, _>>(),
+            ),
+            _ => println!("nothing to do!"),
+        }
+    }
+}
+*/
+
 // Genbade yakudatsu ch.2
 
 #[cfg(test)]
@@ -111,7 +148,7 @@ mod tests {
     #[test]
     fn test_pig_latin_from() {
         assert_eq!("", pig_latin_from(""));
-        assert_eq!("apple-hay", pig_latin_from("apple"));        
+        assert_eq!("apple-hay", pig_latin_from("apple"));
         assert_eq!("irst-fay", pig_latin_from("first"));
         assert_eq!("econd-say", pig_latin_from("second"));
         assert_eq!("egg-hay", pig_latin_from("egg"));
