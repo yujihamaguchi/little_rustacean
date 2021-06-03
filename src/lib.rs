@@ -83,7 +83,7 @@ fn first_word(s: &str) -> Option<&str> {
         None
     } else {
         match s.split(' ').collect::<Vec<_>>().as_slice() {
-            [s, _ss @ ..] => Some(s),
+            [first, _rest @ ..] => Some(first),
             _ => panic!("unexpected pattern!"),
         }
     }
