@@ -101,14 +101,31 @@ fn first_word(s: &str) -> &str {
 }
 */
 
-// 0070. Write a function named `largest` returning largest one of elements.
+// 0070. Write a function named `largest_for_copy` returning largest one of elements which implements Copy trait.
 #[allow(dead_code)]
-fn largest<T: PartialOrd + Copy>(list: &[T]) -> Option<T> {
+fn largest_for_copy<T: PartialOrd + Copy>(list: &[T]) -> Option<T> {
     if list.is_empty() {
         None
     } else {
         let mut largest = list[0];
         for &item in list.iter() {
+            if item > largest {
+                largest = item;
+            }
+        }
+        Some(largest)
+    }
+}
+
+// 0080. Write a function named `largest_for_clone` returning largest one of elements which implements Clone trait.
+#[allow(dead_code)]
+fn largest_for_clone<T: PartialOrd + Clone>(list: &[T]) -> Option<T> {
+    if list.is_empty() {
+        None
+    } else {
+        let mut largest = list[0].clone();
+        for item in list.iter() {
+            let item = item.clone();
             if item > largest {
                 largest = item;
             }
@@ -210,9 +227,14 @@ mod tests {
     }
 
     #[test]
-    fn test_largest() {
+    fn test_largest_for_copy() {
         // assert_eq!(None, largest(vec![]));
-        assert_eq!(Some(100), largest(&vec![34, 50, 25, 100, 65]));
-        assert_eq!(Some('y'), largest(&vec!['y', 'm', 'a', 'q']));
+        assert_eq!(Some(100), largest_for_copy(&vec![34, 50, 25, 100, 65]));
+        assert_eq!(Some('y'), largest_for_copy(&vec!['y', 'm', 'a', 'q']));
+    }
+
+    #[test]
+    fn test_largest_for_clone() {
+        assert_eq!(Some(String::from("foo")), largest_for_clone(&vec![String::from("bar"), String::from("foo"), String::from("baz")]));
     }
 }
