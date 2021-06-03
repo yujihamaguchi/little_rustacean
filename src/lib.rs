@@ -1,3 +1,4 @@
+use core::panic;
 use std::collections::HashMap;
 
 // 0010. Write a function named `my_sum` summing list of usize elements.
@@ -74,6 +75,31 @@ fn pig_latin_from(s: &str) -> String {
         None => s.to_string(),
     }
 }
+
+// 0060. Write a function named `first_word` returning first word of string passed as parameter.
+#[allow(dead_code)]
+fn first_word(s: &str) -> Option<&str> {
+    if s.is_empty() {
+        None
+    } else {
+        match s.split(' ').collect::<Vec<_>>().as_slice() {
+            [s, _ss @ ..] => Some(s),
+            _ => panic!("unexpected pattern!"),
+        }
+    }
+}
+
+/*
+fn first_word(s: &str) -> &str {
+    let bytes = s.as_bytes();
+    for (i, &item) in bytes.iter().enumerate() {
+        if item == b' ' {
+            return &s[0..i];
+        }
+    }
+    &s[..]
+}
+*/
 
 /*
 // ハッシュマップとベクタを使用して、ユーザに会社の部署に雇用者の名前を追加させられるテキストインターフェイスを作ってください。
@@ -158,5 +184,12 @@ mod tests {
         assert_eq!("issue-hay", pig_latin_from("issue"));
         assert_eq!("useless-hay", pig_latin_from("useless"));
         assert_eq!("out-hay", pig_latin_from("out"));
+    }
+
+    #[test]
+    fn test_first_word() {
+        assert_eq!(None, first_word(""));
+        assert_eq!(Some("foo"), first_word("foo"));
+        assert_eq!(Some("foo"), first_word("foo bar baz"));
     }
 }
