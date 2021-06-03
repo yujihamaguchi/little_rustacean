@@ -101,6 +101,22 @@ fn first_word(s: &str) -> &str {
 }
 */
 
+// 0070. Write a function named `largest` returning largest one of elements.
+#[allow(dead_code)]
+fn largest<T: PartialOrd + Copy>(list: &[T]) -> Option<T> {
+    if list.is_empty() {
+        None
+    } else {
+        let mut largest = list[0];
+        for &item in list.iter() {
+            if item > largest {
+                largest = item;
+            }
+        }
+        Some(largest)
+    }
+}
+
 /*
 // ハッシュマップとベクタを使用して、ユーザに会社の部署に雇用者の名前を追加させられるテキストインターフェイスを作ってください。
 // 例えば、"Add Sally to Engineering"(開発部門にサリーを追加)や"Add Amir to Sales"(販売部門にアミールを追加)などです。
@@ -191,5 +207,12 @@ mod tests {
         assert_eq!(None, first_word(""));
         assert_eq!(Some("foo"), first_word("foo"));
         assert_eq!(Some("foo"), first_word("foo bar baz"));
+    }
+
+    #[test]
+    fn test_largest() {
+        // assert_eq!(None, largest(vec![]));
+        assert_eq!(Some(100), largest(&vec![34, 50, 25, 100, 65]));
+        assert_eq!(Some('y'), largest(&vec!['y', 'm', 'a', 'q']));
     }
 }
