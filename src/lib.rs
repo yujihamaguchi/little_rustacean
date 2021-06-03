@@ -57,7 +57,10 @@ fn my_mode(ns: &[usize]) -> Option<usize> {
         for &n in ns {
             *occurrences.entry(n).or_insert(0) += 1;
         }
-        let (&k, _) = occurrences.iter().max_by(|(_, v1), (_, v2)| v1.cmp(v2)).unwrap();
+        let (&k, _) = occurrences
+            .iter()
+            .max_by(|(_, v1), (_, v2)| v1.cmp(v2))
+            .unwrap();
         Some(k)
     }
 }
