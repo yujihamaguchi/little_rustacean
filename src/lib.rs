@@ -134,6 +134,22 @@ fn largest_for_clone<T: PartialOrd + Clone>(list: &[T]) -> Option<T> {
     }
 }
 
+// 0090. Write a function named `largest` returning largest one of elements.
+#[allow(dead_code)]
+fn largest<T: PartialOrd>(list: &[T]) -> Option<&T> {
+    if list.is_empty() {
+        None
+    } else {
+        let mut largest = &list[0];
+        for item in list.iter() {
+            if item > largest {
+                largest = item;
+            }
+        }
+        Some(largest)
+    }
+}
+
 /*
 // ハッシュマップとベクタを使用して、ユーザに会社の部署に雇用者の名前を追加させられるテキストインターフェイスを作ってください。
 // 例えば、"Add Sally to Engineering"(開発部門にサリーを追加)や"Add Amir to Sales"(販売部門にアミールを追加)などです。
@@ -237,4 +253,12 @@ mod tests {
     fn test_largest_for_clone() {
         assert_eq!(Some(String::from("foo")), largest_for_clone(&vec![String::from("bar"), String::from("foo"), String::from("baz")]));
     }
+
+    #[test]
+    fn test_largest() {
+        assert_eq!(Some(&100), largest(&vec![34, 50, 25, 100, 65]));
+        assert_eq!(Some(&'y'), largest(&vec!['y', 'm', 'a', 'q']));
+        assert_eq!(Some(&String::from("foo")), largest(&vec![String::from("bar"), String::from("foo"), String::from("baz")]));
+    }
+
 }
