@@ -4,29 +4,17 @@ use core::panic;
 use std::{collections::HashMap, thread, time::Duration};
 
 // 0010. Write a function named `my_sum` summing list of usize elements.
+
+// use reduce
 fn my_sum(ns: &[usize]) -> usize {
-    *ns.iter().reduce(|acc, n| &(acc + n) ).unwrap_or(&0)
+    ns.to_vec()
+        .into_iter()
+        .reduce(|acc, n| acc + n)
+        .unwrap_or(0)
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* #[allow(dead_code)]
+/*
+//  use recursion
 fn my_sum(ns: &[usize]) -> usize {
     fn my_sum(acc: usize, ns: &[usize]) -> usize {
         match ns {
@@ -217,7 +205,9 @@ where
 }
 
 impl<T> Cacher<T>
-where T: Fn(u32) -> u32 {
+where
+    T: Fn(u32) -> u32,
+{
     fn new(calculation: T) -> Cacher<T> {
         Cacher {
             calculation,
@@ -245,7 +235,7 @@ fn generate_workout(intensity: u32, random_number: u32) {
     }
 
     let mut cacher = Cacher::new(|_| simulated_expensive_calculation(intensity));
-    
+
     if intensity < 25 {
         println!("Today, do {} pushups!", cacher.value(intensity));
 
@@ -259,7 +249,7 @@ fn generate_workout(intensity: u32, random_number: u32) {
     }
 }
 
-// The Book: Ch12. An I/O Project: Building a Command Line Program 
+// The Book: Ch12. An I/O Project: Building a Command Line Program
 
 /*
 // ハッシュマップとベクタを使用して、ユーザに会社の部署に雇用者の名前を追加させられるテキストインターフェイスを作ってください。
