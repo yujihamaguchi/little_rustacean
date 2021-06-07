@@ -1,8 +1,32 @@
+pub mod helper;
+
 use core::panic;
-use std::collections::HashMap;
+use std::{collections::HashMap, thread, time::Duration};
 
 // 0010. Write a function named `my_sum` summing list of usize elements.
-#[allow(dead_code)]
+fn my_sum(ns: &[usize]) -> usize {
+    *ns.iter().reduce(|acc, n| &(acc + n) ).unwrap_or(&0)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* #[allow(dead_code)]
 fn my_sum(ns: &[usize]) -> usize {
     fn my_sum(acc: usize, ns: &[usize]) -> usize {
         match ns {
@@ -12,7 +36,7 @@ fn my_sum(ns: &[usize]) -> usize {
     }
     my_sum(0, ns)
 }
-
+ */
 // 0020. Write a function named 'my_mean' to calculate an average for list of some numbers.
 #[allow(dead_code)]
 fn my_mean(ns: &[usize]) -> Option<usize> {
@@ -150,6 +174,93 @@ fn largest<T: PartialOrd>(list: &[T]) -> Option<&T> {
     }
 }
 
+// The Book: Ch.13.1 Closures: Anonymous Functions that Can Capture Their Environment
+/*
+// Before tuning.
+#[allow(dead_code)]
+fn generate_workout(intensity: u32, random_number: u32) {
+    fn simulated_expensive_calculation(intensity: u32) -> u32 {
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        intensity
+    }
+    if intensity < 25 {
+
+        println!(
+            "Today, do {} pushups!",
+            simulated_expensive_calculation(intensity)
+        );
+
+        println!(
+            "Next, do {} situps!",
+            simulated_expensive_calculation(intensity)
+        );
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!(
+                "Today, run for {} minutes!",
+                simulated_expensive_calculation(intensity)
+            );
+        }
+    }
+}
+*/
+
+struct Cacher<T>
+where
+    T: Fn(u32) -> u32,
+{
+    calculation: T,
+    value: Option<u32>,
+}
+
+impl<T> Cacher<T>
+where T: Fn(u32) -> u32 {
+    fn new(calculation: T) -> Cacher<T> {
+        Cacher {
+            calculation,
+            value: None,
+        }
+    }
+    fn value(&mut self, v: u32) -> u32 {
+        match self.value {
+            Some(v) => v,
+            None => {
+                let v = (self.calculation)(v);
+                self.value = Some(v);
+                v
+            }
+        }
+    }
+}
+
+#[allow(dead_code)]
+fn generate_workout(intensity: u32, random_number: u32) {
+    fn simulated_expensive_calculation(intensity: u32) -> u32 {
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        intensity
+    }
+
+    let mut cacher = Cacher::new(|_| simulated_expensive_calculation(intensity));
+    
+    if intensity < 25 {
+        println!("Today, do {} pushups!", cacher.value(intensity));
+
+        println!("Next, do {} situps!", cacher.value(intensity));
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!("Today, run for {} minutes!", cacher.value(intensity));
+        }
+    }
+}
+
+// The Book: Ch12. An I/O Project: Building a Command Line Program 
+
 /*
 // ハッシュマップとベクタを使用して、ユーザに会社の部署に雇用者の名前を追加させられるテキストインターフェイスを作ってください。
 // 例えば、"Add Sally to Engineering"(開発部門にサリーを追加)や"Add Amir to Sales"(販売部門にアミールを追加)などです。
@@ -251,14 +362,34 @@ mod tests {
 
     #[test]
     fn test_largest_for_clone() {
-        assert_eq!(Some(String::from("foo")), largest_for_clone(&vec![String::from("bar"), String::from("foo"), String::from("baz")]));
+        assert_eq!(
+            Some(String::from("foo")),
+            largest_for_clone(&vec![
+                String::from("bar"),
+                String::from("foo"),
+                String::from("baz")
+            ])
+        );
     }
 
     #[test]
     fn test_largest() {
         assert_eq!(Some(&100), largest(&vec![34, 50, 25, 100, 65]));
         assert_eq!(Some(&'y'), largest(&vec!['y', 'm', 'a', 'q']));
-        assert_eq!(Some(&String::from("foo")), largest(&vec![String::from("bar"), String::from("foo"), String::from("baz")]));
+        assert_eq!(
+            Some(&String::from("foo")),
+            largest(&vec![
+                String::from("bar"),
+                String::from("foo"),
+                String::from("baz")
+            ])
+        );
     }
 
+    #[test]
+    fn test_list_workout_in_specific_secs() {
+        assert_eq!(2, helper::execution_seconds(|| generate_workout(24, 0)));
+        assert_eq!(2, helper::execution_seconds(|| generate_workout(25, 0)));
+        assert_eq!(0, helper::execution_seconds(|| generate_workout(25, 3)));
+    }
 }
