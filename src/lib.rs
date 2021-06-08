@@ -3,19 +3,20 @@ pub mod helper;
 use core::panic;
 use std::{collections::HashMap, thread, time::Duration};
 
-// 0010. Write a function named `my_sum` summing list of usize elements.
-
+// 0010. Write a function named `my_sum` summing array of usize elements.
 // use reduce
 fn my_sum(ns: &[usize]) -> usize {
+    // I use `to_vec` because Array ([T: N] type) doesn't implement IntoIterator.
+    // https://doc.rust-lang.org/std/primitive.array.html#impl-IntoIterator
+    // `IntoIterator (implemented for &[T; N] and &mut [T; N])`
     ns.to_vec()
         .into_iter()
         .reduce(|acc, n| acc + n)
         .unwrap_or(0)
 }
 
-/*
 //  use recursion
-fn my_sum(ns: &[usize]) -> usize {
+/* fn my_sum(ns: &[usize]) -> usize {
     fn my_sum(acc: usize, ns: &[usize]) -> usize {
         match ns {
             [] => acc,
@@ -25,6 +26,7 @@ fn my_sum(ns: &[usize]) -> usize {
     my_sum(0, ns)
 }
  */
+ 
 // 0020. Write a function named 'my_mean' to calculate an average for list of some numbers.
 #[allow(dead_code)]
 fn my_mean(ns: &[usize]) -> Option<usize> {
@@ -296,9 +298,9 @@ mod tests {
     use super::*;
     #[test]
     fn test_my_sum() {
-        assert_eq!(0, my_sum(&vec![]));
-        assert_eq!(1, my_sum(&vec![1]));
-        assert_eq!(6, my_sum(&vec![1, 2, 3]));
+        assert_eq!(0, my_sum(&[]));
+        assert_eq!(1, my_sum(&[1]));
+        assert_eq!(6, my_sum(&[1, 2, 3]));
     }
     #[test]
     fn test_my_mean() {
