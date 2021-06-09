@@ -1,7 +1,7 @@
 pub mod helper;
 
 use core::panic;
-use std::{collections::HashMap, thread, time::Duration};
+use std::{collections::HashMap, thread, time::Duration, u32};
 
 // 0010. Write a function named `my_sum` summing array of usize elements.
 // use reduce
@@ -26,7 +26,7 @@ fn my_sum(ns: &[usize]) -> usize {
     my_sum(0, ns)
 }
  */
- 
+
 // 0020. Write a function named 'my_mean' to calculate an average for list of some numbers.
 #[allow(dead_code)]
 fn my_mean(ns: &[usize]) -> Option<usize> {
@@ -164,7 +164,45 @@ fn largest<T: PartialOrd>(list: &[T]) -> Option<&T> {
     }
 }
 
-// The Book: Ch.13.1 Closures: Anonymous Functions that Can Capture Their Environment
+// 0095. The Book: Ch12. An I/O Project: Building a Command Line Program
+// ハッシュマップとベクタを使用して、ユーザに会社の部署に雇用者の名前を追加させられるテキストインターフェイスを作ってください。
+// 例えば、"Add Sally to Engineering"(開発部門にサリーを追加)や"Add Amir to Sales"(販売部門にアミールを追加)などです。
+// それからユーザに、ある部署にいる人間の一覧や部署ごとにアルファベット順で並べ替えられた会社の全人間の一覧を扱わせてあげてください。
+/*
+use std::{collections::HashMap, io};
+
+fn main() {
+    let mut depts: HashMap<String, Vec<String>> = HashMap::new();
+    loop {
+        println!("Command?");
+
+        let mut command = String::new();
+        io::stdin()
+            .read_line(&mut command)
+            .expect("Failed to read line!");
+
+        match command.trim().split(' ').collect::<Vec<_>>().as_slice() {
+            ["add", name, "to", dept] => {
+                depts
+                    .entry(dept.to_string())
+                    .or_insert(Vec::new())
+                    .push(name.to_string());
+            }
+            ["list"] => list(&depts),
+            ["list", target_dept] => list(
+                &depts
+                    .iter()
+                    .filter(|(dept, _)| dept == target_dept)
+                    .map(|(k, v)| (k.clone(), v.clone()))
+                    .collect::<HashMap<_, _>>(),
+            ),
+            _ => println!("nothing to do!"),
+        }
+    }
+}
+*/
+
+// 0100. The Book: Ch.13.1 Closures: Anonymous Functions that Can Capture Their Environment
 /*
 // Before tuning.
 #[allow(dead_code)]
@@ -198,6 +236,29 @@ fn generate_workout(intensity: u32, random_number: u32) {
 }
 */
 
+#[allow(dead_code)]
+fn generate_workout(intensity: u32, random_number: u32) {
+    fn simulated_expensive_calculation(intensity: u32) -> u32 {
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        intensity
+    }
+
+    let mut cacher = Cacher::new(|_| simulated_expensive_calculation(intensity));
+
+    if intensity < 25 {
+        println!("Today, do {} pushups!", cacher.value(intensity));
+
+        println!("Next, do {} situps!", cacher.value(intensity));
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!("Today, run for {} minutes!", cacher.value(intensity));
+        }
+    }
+}
+
 struct Cacher<T>
 where
     T: Fn(u32) -> u32,
@@ -228,68 +289,89 @@ where
     }
 }
 
+// Cacher実装の限界
+// 0110. 単独の値ではなく、ハッシュマップを保持するようにCacherを改変してみてください。
 #[allow(dead_code)]
-fn generate_workout(intensity: u32, random_number: u32) {
-    fn simulated_expensive_calculation(intensity: u32) -> u32 {
-        println!("calculating slowly...");
-        thread::sleep(Duration::from_secs(2));
-        intensity
-    }
+struct Cacher2<T>
+where
+    T: Fn(u32) -> u32,
+{
+    calculation: T,
+    value: HashMap<u32, u32>,
+}
 
-    let mut cacher = Cacher::new(|_| simulated_expensive_calculation(intensity));
-
-    if intensity < 25 {
-        println!("Today, do {} pushups!", cacher.value(intensity));
-
-        println!("Next, do {} situps!", cacher.value(intensity));
-    } else {
-        if random_number == 3 {
-            println!("Take a break today! Remember to stay hydrated!");
-        } else {
-            println!("Today, run for {} minutes!", cacher.value(intensity));
+#[allow(dead_code)]
+impl<T> Cacher2<T>
+where
+    T: Fn(u32) -> u32,
+{
+    fn new(calculation: T) -> Cacher2<T> {
+        Cacher2 {
+            calculation,
+            value: HashMap::new(),
         }
+    }
+    fn value(&mut self, v: u32) -> u32 {
+        self.value.entry(v).or_insert((self.calculation)(v));
+        self.value[&v]
     }
 }
 
-// The Book: Ch12. An I/O Project: Building a Command Line Program
+// 0112. 現在のCacher実装の2番目の問題は、引数の型にu32を一つ取り、u32を返すクロージャしか受け付けないことです。
+//       例えば、文字列スライスを取り、usizeを返すクロージャの結果をキャッシュしたくなるかもしれません。
+//       この問題を修正するには、Cacher機能の柔軟性を向上させるためによりジェネリックな引数を導入してみてください。
+#[allow(dead_code)]
+struct Cacher3<T, U>
+where
+    T: Fn(U) -> U,
+{
+    calculation: T,
+    value: HashMap<U, U>,
+}
 
-/*
-// ハッシュマップとベクタを使用して、ユーザに会社の部署に雇用者の名前を追加させられるテキストインターフェイスを作ってください。
-// 例えば、"Add Sally to Engineering"(開発部門にサリーを追加)や"Add Amir to Sales"(販売部門にアミールを追加)などです。
-// それからユーザに、ある部署にいる人間の一覧や部署ごとにアルファベット順で並べ替えられた会社の全人間の一覧を扱わせてあげてください。
-
-use std::{collections::HashMap, io};
-
-fn main() {
-    let mut depts: HashMap<String, Vec<String>> = HashMap::new();
-    loop {
-        println!("Command?");
-
-        let mut command = String::new();
-        io::stdin()
-            .read_line(&mut command)
-            .expect("Failed to read line!");
-
-        match command.trim().split(' ').collect::<Vec<_>>().as_slice() {
-            ["add", name, "to", dept] => {
-                depts
-                    .entry(dept.to_string())
-                    .or_insert(Vec::new())
-                    .push(name.to_string());
-            }
-            ["list"] => list(&depts),
-            ["list", target_dept] => list(
-                &depts
-                    .iter()
-                    .filter(|(dept, _)| dept == target_dept)
-                    .map(|(k, v)| (k.clone(), v.clone()))
-                    .collect::<HashMap<_, _>>(),
-            ),
-            _ => println!("nothing to do!"),
+#[allow(dead_code)]
+impl<T, U> Cacher3<T, U>
+where
+    T: Fn(U) -> U,
+    U: Eq + std::hash::Hash + Copy,
+{
+    fn new(calculation: T) -> Cacher3<T, U> {
+        Cacher3 {
+            calculation,
+            value: HashMap::new(),
         }
     }
+    fn value(&mut self, v: U) -> U {
+        self.value.entry(v).or_insert((self.calculation)(v));
+        self.value[&v]
+    }
 }
-*/
+
+// 0120. 絶対に1から5をカウントするだけのイテレータを作成しましょう。
+#[allow(dead_code)]
+struct Counter {
+    count: u32,
+}
+
+#[allow(dead_code)]
+impl Counter {
+    fn new() -> Self {
+        Counter { count: 0 }
+    }
+}
+
+#[allow(dead_code)]
+impl Iterator for Counter {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.count > 4 {
+            return None;
+        }
+        self.count += 1;
+        Some(self.count)
+    }
+}
 
 // Genbade yakudatsu ch.2
 
@@ -383,5 +465,42 @@ mod tests {
         assert_eq!(2, helper::execution_seconds(|| generate_workout(24, 0)));
         assert_eq!(2, helper::execution_seconds(|| generate_workout(25, 0)));
         assert_eq!(0, helper::execution_seconds(|| generate_workout(25, 3)));
+    }
+
+    #[test]
+    fn test_cacher() {
+        let mut cacher = Cacher2::new(|a| a);
+        assert_eq!(1, cacher.value(1));
+        assert_eq!(2, cacher.value(2));
+    }
+
+    #[test]
+    fn test_generic_cacher() {
+        let mut cacher = Cacher3::new(|a| a);
+        assert_eq!("foo", cacher.value("foo"));
+        let mut cacher = Cacher3::new(|a| a);
+        assert_eq!(1, cacher.value(1));
+    }
+
+    #[test]
+    fn calling_next_directly() {
+        let mut counter = Counter::new();
+
+        assert_eq!(counter.next(), Some(1));
+        assert_eq!(counter.next(), Some(2));
+        assert_eq!(counter.next(), Some(3));
+        assert_eq!(counter.next(), Some(4));
+        assert_eq!(counter.next(), Some(5));
+        assert_eq!(counter.next(), None);
+    }
+
+    #[test]
+    fn using_other_iterator_trait_methods() {
+        let sum: u32 = Counter::new()
+            .zip(Counter::new().skip(1))
+            .map(|(a, b)| a * b)
+            .filter(|x| x % 3 == 0)
+            .sum();
+        assert_eq!(18, sum);
     }
 }
