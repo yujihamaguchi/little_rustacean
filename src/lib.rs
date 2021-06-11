@@ -27,7 +27,7 @@ fn my_sum(ns: &[usize]) -> usize {
 }
  */
 
-// 0020. Write a function named 'my_mean' to calculate an average for list of some numbers.
+// 0020. Write a function named 'my_mean' to calculate an average for array of some numbers.
 #[allow(dead_code)]
 fn my_mean(ns: &[usize]) -> Option<usize> {
     match ns.len() {
@@ -36,15 +36,15 @@ fn my_mean(ns: &[usize]) -> Option<usize> {
     }
 }
 
-// 0025. Write a function named 'my_sort' to sort list of some numbers.
+// 0025. Write a function named 'my_sort' to sort array of some numbers.
 #[allow(dead_code)]
 fn my_sort(ns: &[usize]) -> Vec<usize> {
     match ns {
         [] => vec![],
         [n, ns @ ..] => {
             let v = ns.to_vec();
-            let lt: Vec<usize> = v.iter().filter(|&m| m < n).cloned().collect();
-            let ge: Vec<usize> = v.iter().filter(|&m| n <= m).cloned().collect();
+            let lt = v.iter().filter(|&m| m < n).cloned().collect::<Vec<_>>();
+            let ge = v.iter().filter(|&m| n <= m).cloned().collect::<Vec<_>>();
             [my_sort(&lt), vec![*n], my_sort(&ge)].concat()
         }
     }
@@ -377,6 +377,7 @@ impl Iterator for Counter {
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
     #[test]
     fn test_my_sum() {
