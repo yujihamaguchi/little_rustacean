@@ -68,7 +68,7 @@ fn my_median(ns: &mut [usize]) -> Option<usize> {
 // 2.草稿ができたら、査読が要求される。
 // 3.記事が承認されたら、公開される。
 // 4.公開されたブログ記事だけが表示する内容を返すので、未承認の記事は、誤って公開されない。
-#[allow(dead_code)]
+/* #[allow(dead_code)]
 struct Post {
     state: Option<Box<dyn State>>,
     content: String,
@@ -178,15 +178,14 @@ impl State for Published {
         self
     }
 }
-
-// その後、以下の要件を満たしてみる
-// ステートパターンを使用した実装は、拡張して機能を増やすことが容易です。 ステートパターンを使用するコードの管理の単純さを確認するために、以下の提言を試してみてください:
-// - 記事の状態をPendingReviewからDraftに戻すrejectメソッドを追加する。
-// - 状態がPublishedに変化させられる前にapproveを2回呼び出す必要があるようにする。
-// - 記事がDraft状態の時のみテキスト内容をユーザが追加できるようにする。 ヒント: ステートオブジェクトに内容について変わる可能性のあるものの責任を持たせつつも、 Postを変更することには責任を持たせない。
-//
+ */
 // その後、状態とふるまいを型としてコード化する(https://doc.rust-jp.rs/book-ja/ch17-03-oo-design-patterns.html#%E7%8A%B6%E6%85%8B%E3%81%A8%E6%8C%AF%E3%82%8B%E8%88%9E%E3%81%84%E3%82%92%E5%9E%8B%E3%81%A8%E3%81%97%E3%81%A6%E3%82%B3%E3%83%BC%E3%83%89%E5%8C%96%E3%81%99%E3%82%8B)
-//
+// 要件
+// 1.ブログ記事は、空の草稿から始まる。
+// 2.草稿ができたら、査読が要求される。
+// 3.記事が承認されたら、公開される。
+// 4.公開されたブログ記事だけが表示する内容を返すので、未承認の記事は、誤って公開されない。
+
 // その後、このバージョンで追加要件を実現してみる
 
 // 0040. Write a function named my_mode calclating the mode of elements of list.
@@ -633,48 +632,103 @@ mod tests {
         assert_eq!(18, sum);
     }
 
+    /*    #[test]
+       fn test_blog() {
+           // 1.ブログ記事は、空の草稿から始まる。
+           // 2.草稿ができたら、査読が要求される。
+           // 3.記事が承認されたら、公開される。
+           // 4.公開されたブログ記事だけが表示する内容を返すので、未承認の記事は、誤って公開されない。
+           let content = "hello, world!";
+            let mut post = Post::new();
+           post.add_text(content);
+           assert_eq!("", post.content());
+           post.request_review();
+           assert_eq!("", post.content());
+           post.approve();
+           assert_eq!(content, post.content());
+    */
+    // その後、以下の要件を満たしてみる
+    // - 記事の状態をPendingReviewからDraftに戻すrejectメソッドを追加する。
+    /*         let mut post = Post::new();
+           post.add_text(content);
+           post.request_review();
+           post.reject();
+           assert_eq!("", post.content());
+           post.approve();
+           assert_eq!("", post.content());
+    */
+    // - 状態がPublishedに変化させられる前にapproveを2回呼び出す必要があるようにする。
+    /*         let mut post = Post::new();
+           post.add_text(content);
+           post.request_review();
+           post.approve();
+           assert_eq!("", post.content());
+           post.approve();
+           assert_eq!(content, post.content());
+    */
+    // - 記事がDraft状態の時のみテキスト内容をユーザが追加できるようにする。
+    //   ヒント: ステートオブジェクトに内容について変わる可能性のあるものの責任を持たせつつも、 Postを変更することには責任を持たせない。
+    /*         let mut post = Post::new();
+           post.add_text(content);
+           post.request_review();
+           post.add_text(content);
+           post.approve();
+           post.approve();
+           assert_eq!(content, post.content());
+    }
+    */
     #[test]
-    fn test_blog() {
+    fn text_blog_type() {
         // 1.ブログ記事は、空の草稿から始まる。
         // 2.草稿ができたら、査読が要求される。
         // 3.記事が承認されたら、公開される。
         // 4.公開されたブログ記事だけが表示する内容を返すので、未承認の記事は、誤って公開されない。
-        let content = "hello, world!";        
-/*         let mut post = Post::new();
+        struct Post {
+            content: String,
+        }
+        struct DraftPost {
+            content: String,
+        }
+        struct PendingReviewPost {
+            content: String,
+        }
+        impl Post {
+            fn new() -> DraftPost {
+                DraftPost {
+                    content: String::new(),
+                }
+            }
+            fn content(&self) -> &str {
+                &self.content
+            }
+        }
+        impl DraftPost {
+            fn add_text(&mut self, text: &str) {
+                self.content.push_str(text)
+            }
+            fn request_review(self) -> PendingReviewPost {
+                PendingReviewPost {
+                    content: self.content,
+                }
+            }
+        }
+        impl PendingReviewPost {
+            fn approve(self) -> Post {
+                Post {
+                    content: self.content,
+                }
+            }
+        }
+        let mut post = Post::new();
+        let content = "hello world!";
         post.add_text(content);
-        assert_eq!("", post.content());
-        post.request_review();
-        assert_eq!("", post.content());
-        post.approve();
+        let post = post.request_review();
+        let post = post.approve();
         assert_eq!(content, post.content());
- */
         // その後、以下の要件を満たしてみる
         // - 記事の状態をPendingReviewからDraftに戻すrejectメソッドを追加する。
-/*         let mut post = Post::new();
-        post.add_text(content);
-        post.request_review();
-        post.reject();
-        assert_eq!("", post.content());
-        post.approve();
-        assert_eq!("", post.content());
- */
         // - 状態がPublishedに変化させられる前にapproveを2回呼び出す必要があるようにする。
-        let mut post = Post::new();
-        post.add_text(content);
-        post.request_review();
-        post.approve();
-        assert_eq!("", post.content());
-        post.approve();
-        assert_eq!(content, post.content());
-
-        // - 記事がDraft状態の時のみテキスト内容をユーザが追加できるようにする。 
+        // - 記事がDraft状態の時のみテキスト内容をユーザが追加できるようにする。
         //   ヒント: ステートオブジェクトに内容について変わる可能性のあるものの責任を持たせつつも、 Postを変更することには責任を持たせない。
-        let mut post = Post::new();
-        post.add_text(content);
-        post.request_review();
-        post.add_text(content);
-        post.approve();
-        post.approve();
-        assert_eq!(content, post.content());
     }
 }
