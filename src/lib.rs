@@ -1,3 +1,4 @@
+#![feature(type_name_of_val)]
 pub mod helper;
 
 use core::panic;
@@ -62,124 +63,9 @@ fn my_median(ns: &mut [usize]) -> Option<usize> {
     }
 }
 
-// https://doc.rust-jp.rs/book-ja/ch17-03-oo-design-patterns.html
-// 以下の要件で作ってみる
-// 1.ブログ記事は、空の草稿から始まる。
-// 2.草稿ができたら、査読が要求される。
-// 3.記事が承認されたら、公開される。
-// 4.公開されたブログ記事だけが表示する内容を返すので、未承認の記事は、誤って公開されない。
-/* #[allow(dead_code)]
-struct Post {
-    state: Option<Box<dyn State>>,
-    content: String,
-}
-#[allow(dead_code)]
-impl Post {
-    fn new() -> Post {
-        Post {
-            state: Some(Box::new(Draft {})),
-            content: String::new(),
-        }
-    }
-    fn add_text(&mut self, text: &str) {
-        if self.state.as_ref().unwrap().editable() {
-            self.content.push_str(text)
-        }
-    }
-    fn content(&self) -> &str {
-        self.state.as_ref().unwrap().content(&self)
-    }
-    fn request_review(&mut self) {
-        if let Some(s) = self.state.take() {
-            self.state = Some(s.request_review())
-        }
-    }
-    fn approve(&mut self) {
-        if let Some(s) = self.state.take() {
-            self.state = Some(s.approve())
-        }
-    }
-    fn reject(&mut self) {
-        if let Some(s) = self.state.take() {
-            self.state = Some(s.reject())
-        }
-    }
-}
-trait State {
-    fn request_review(self: Box<Self>) -> Box<dyn State>;
-    fn approve(self: Box<Self>) -> Box<dyn State>;
-    fn reject(self: Box<Self>) -> Box<dyn State>;
-    fn content<'a>(&self, _: &'a Post) -> &'a str {
-        ""
-    }
-    fn editable(&self) -> bool {
-        false
-    }
-}
-struct Draft {}
-
-impl State for Draft {
-    fn request_review(self: Box<Self>) -> Box<dyn State> {
-        Box::new(PendingReview { approve_count: 0 })
-    }
-
-    fn approve(self: Box<Self>) -> Box<dyn State> {
-        self
-    }
-
-    fn reject(self: Box<Self>) -> Box<dyn State> {
-        self
-    }
-
-    fn editable(&self) -> bool {
-        true
-    }
-
-}
-
-struct PendingReview {
-    approve_count: usize,
-}
-
-impl State for PendingReview {
-    fn request_review(self: Box<Self>) -> Box<dyn State> {
-        self
-    }
-
-    fn approve(mut self: Box<Self>) -> Box<dyn State> {
-        if self.approve_count > 0 {
-            Box::new(Published {})
-        } else {
-            self.approve_count += 1;
-            self
-        }
-    }
-
-    fn reject(self: Box<Self>) -> Box<dyn State> {
-        Box::new(Draft {})
-    }
-}
-
-struct Published {}
-impl State for Published {
-    fn request_review(self: Box<Self>) -> Box<dyn State> {
-        self
-    }
-
-    fn approve(self: Box<Self>) -> Box<dyn State> {
-        self
-    }
-
-    fn content<'a>(&self, post: &'a Post) -> &'a str {
-        &post.content
-    }
-
-    fn reject(self: Box<Self>) -> Box<dyn State> {
-        self
-    }
-}
- */
-// その後、状態とふるまいを型としてコード化する(https://doc.rust-jp.rs/book-ja/ch17-03-oo-design-patterns.html#%E7%8A%B6%E6%85%8B%E3%81%A8%E6%8C%AF%E3%82%8B%E8%88%9E%E3%81%84%E3%82%92%E5%9E%8B%E3%81%A8%E3%81%97%E3%81%A6%E3%82%B3%E3%83%BC%E3%83%89%E5%8C%96%E3%81%99%E3%82%8B)
+// 0031. go to test_blog_oop
+// 0032. go to test_blog_not_oop
+// その後、状態とふるまいを型としてコード化する()
 // 要件
 // 1.ブログ記事は、空の草稿から始まる。
 // 2.草稿ができたら、査読が要求される。
@@ -502,7 +388,10 @@ impl Iterator for Counter {
 // Genbade yakudatsu ch.2
 
 #[cfg(test)]
+
 mod tests {
+
+    use std::any::type_name_of_val;
 
     use super::*;
     #[test]
@@ -632,64 +521,184 @@ mod tests {
         assert_eq!(18, sum);
     }
 
-    /*    #[test]
-       fn test_blog() {
-           // 1.ブログ記事は、空の草稿から始まる。
-           // 2.草稿ができたら、査読が要求される。
-           // 3.記事が承認されたら、公開される。
-           // 4.公開されたブログ記事だけが表示する内容を返すので、未承認の記事は、誤って公開されない。
-           let content = "hello, world!";
-            let mut post = Post::new();
-           post.add_text(content);
-           assert_eq!("", post.content());
-           post.request_review();
-           assert_eq!("", post.content());
-           post.approve();
-           assert_eq!(content, post.content());
-    */
-    // その後、以下の要件を満たしてみる
-    // - 記事の状態をPendingReviewからDraftに戻すrejectメソッドを追加する。
-    /*         let mut post = Post::new();
-           post.add_text(content);
-           post.request_review();
-           post.reject();
-           assert_eq!("", post.content());
-           post.approve();
-           assert_eq!("", post.content());
-    */
-    // - 状態がPublishedに変化させられる前にapproveを2回呼び出す必要があるようにする。
-    /*         let mut post = Post::new();
-           post.add_text(content);
-           post.request_review();
-           post.approve();
-           assert_eq!("", post.content());
-           post.approve();
-           assert_eq!(content, post.content());
-    */
-    // - 記事がDraft状態の時のみテキスト内容をユーザが追加できるようにする。
-    //   ヒント: ステートオブジェクトに内容について変わる可能性のあるものの責任を持たせつつも、 Postを変更することには責任を持たせない。
-    /*         let mut post = Post::new();
-           post.add_text(content);
-           post.request_review();
-           post.add_text(content);
-           post.approve();
-           post.approve();
-           assert_eq!(content, post.content());
-    }
-    */
     #[test]
-    fn text_blog_type() {
+    fn test_blog_oop() {
+        // https://doc.rust-jp.rs/book-ja/ch17-03-oo-design-patterns.html
+        // 以下の要件で作ってみる
         // 1.ブログ記事は、空の草稿から始まる。
-        // 2.草稿ができたら、査読が要求される。
-        // 3.記事が承認されたら、公開される。
-        // 4.公開されたブログ記事だけが表示する内容を返すので、未承認の記事は、誤って公開されない。
+        let mut post = Post::new();
+        let content = String::from("hello world!");
+        post.add_text(&content);
+        assert_eq!("", post.content());
+
         struct Post {
+            state: Option<Box<dyn State>>,
             content: String,
         }
-        struct DraftPost {
-            content: String,
+        impl Post {
+            fn new() -> Post {
+                Post {
+                    state: Some(Box::new(Draft {})),
+                    content: String::new(),
+                }
+            }
+            fn add_text(&mut self, text: &str) {
+                if self.state.as_ref().unwrap().editable() {
+                    self.content.push_str(text)
+                }
+            }
+            fn content(&self) -> &str {
+                self.state.as_ref().unwrap().content(&self)
+            }
+            fn request_review(&mut self) {
+                if let Some(s) = self.state.take() {
+                    self.state = Some(s.request_review())
+                }
+            }
+            fn approve(&mut self) {
+                if let Some(s) = self.state.take() {
+                    self.state = Some(s.approve())
+                }
+            }
         }
-        struct PendingReviewPost {
+        trait State {
+            fn request_review(self: Box<Self>) -> Box<dyn State>;
+            fn approve(self: Box<Self>) -> Box<dyn State>;
+            fn content<'a>(&self, _: &'a Post) -> &'a str {
+                ""
+            }
+            fn reject(self: Box<Self>) -> Box<dyn State>;
+            fn editable(&self) -> bool {
+                false
+            }
+        }
+        struct Draft {}
+        impl State for Draft {
+            fn request_review(self: Box<Self>) -> Box<dyn State> {
+                Box::new(PendingReview { approve_count: 0 })
+            }
+
+            fn approve(self: Box<Self>) -> Box<dyn State> {
+                self
+            }
+
+            fn reject(self: Box<Self>) -> Box<dyn State> {
+                self
+            }
+
+            fn editable(&self) -> bool {
+                true
+            }
+        }
+        struct PendingReview {
+            approve_count: usize,
+        }
+        impl State for PendingReview {
+            fn request_review(self: Box<Self>) -> Box<dyn State> {
+                self
+            }
+
+            fn approve(mut self: Box<Self>) -> Box<dyn State> {
+                if self.approve_count > 0 {
+                    Box::new(Published {})
+                } else {
+                    self.approve_count += 1;
+                    self
+                }
+            }
+
+            fn reject(self: Box<Self>) -> Box<dyn State> {
+                Box::new(Draft {})
+            }
+        }
+
+        struct Published {}
+        impl State for Published {
+            fn request_review(self: Box<Self>) -> Box<dyn State> {
+                self
+            }
+
+            fn approve(self: Box<Self>) -> Box<dyn State> {
+                self
+            }
+
+            fn content<'a>(&self, post: &'a Post) -> &'a str {
+                &post.content
+            }
+
+            fn reject(self: Box<Self>) -> Box<dyn State> {
+                self
+            }
+        }
+        // 2.草稿ができたら、査読が要求される。
+        post.request_review();
+        assert_eq!("", post.content());
+
+        // 3.記事が承認されたら、公開される。
+        post.approve();
+        //assert_eq!(content, post.content());
+
+        // 4.公開されたブログ記事だけが表示する内容を返すので、未承認の記事は、誤って公開されない。
+        let mut post = Post::new();
+        let content = "hello rust!";
+        post.add_text(content);
+        assert_eq!("", post.content());
+        post.request_review();
+        assert_eq!("", post.content());
+        post.approve();
+        assert_eq!("", post.content());
+        post.approve();
+        assert_eq!(content, post.content());
+
+        // 5.記事の状態をPendingReviewからDraftに戻すrejectメソッドを追加する。
+        impl Post {
+            fn reject(&mut self) {
+                if let Some(s) = self.state.take() {
+                    self.state = Some(s.reject())
+                }
+            }
+        }
+
+        let mut post = Post::new();
+        post.request_review();
+        post.reject();
+        assert_eq!("", post.content());
+
+        // 6.状態がPublishedに変化させられる前にapproveを2回呼び出す必要があるようにする。
+        let mut post = Post::new();
+        let content = "hello rust!";
+        post.add_text(content);
+        post.request_review();
+        post.approve();
+        assert_eq!("", post.content());
+        post.approve();
+        assert_eq!(content, post.content());
+
+        // 7.記事がDraft状態の時のみテキスト内容をユーザが追加できるようにする。
+        //   ヒント: ステートオブジェクトに内容について変わる可能性のあるものの責任を持たせつつも、 Postを変更することには責任を持たせない。
+        let mut post = Post::new();
+        let foo = "foo";
+        post.add_text(foo);
+        post.request_review();
+        post.approve();
+        post.approve();
+        assert_eq!("foo", post.content());
+        post.add_text(foo);
+        assert_eq!("foo", post.content());
+    }
+
+    #[test]
+    fn test_blog_not_oop() {
+        // https://doc.rust-jp.rs/book-ja/ch17-03-oo-design-patterns.html#%E7%8A%B6%E6%85%8B%E3%81%A8%E6%8C%AF%E3%82%8B%E8%88%9E%E3%81%84%E3%82%92%E5%9E%8B%E3%81%A8%E3%81%97%E3%81%A6%E3%82%B3%E3%83%BC%E3%83%89%E5%8C%96%E3%81%99%E3%82%8B
+        // 以下の要件で作ってみる
+        // 1.ブログ記事は、空の草稿から始まる。
+        let post = Post::new();
+        assert_eq!(
+            "little_rustacean::tests::test_blog_not_oop::DraftPost",
+            type_name_of_val(&post)
+        );
+        #[allow(dead_code)]
+        struct Post {
             content: String,
         }
         impl Post {
@@ -698,37 +707,113 @@ mod tests {
                     content: String::new(),
                 }
             }
+        }
+        struct DraftPost {
+            content: String,
+        }
+        impl DraftPost {
+            fn request_review(self) -> PendingReviewPost {
+                PendingReviewPost {
+                    content: self.content,
+                    approved_count: 0,
+                }
+            }
+            fn add_text(&mut self, text: &str) {
+                self.content.push_str(text);
+            }
+        }
+
+        struct PendingReviewPost {
+            content: String,
+            approved_count: usize,
+        }
+
+        impl PendingReviewPost {
+            fn approve(&mut self) -> Option<PublishedPost> {
+                if self.approved_count > 0 {
+                    Some(PublishedPost {
+                        content: self.content.clone(),
+                    })
+                } else {
+                    self.approved_count += 1;
+                    None
+                }
+            }
+            fn reject(self) -> DraftPost {
+                DraftPost {
+                    content: self.content,
+                }
+            }
+        }
+
+        struct PublishedPost {
+            content: String,
+        }
+
+        impl PublishedPost {
             fn content(&self) -> &str {
                 &self.content
             }
         }
-        impl DraftPost {
-            fn add_text(&mut self, text: &str) {
-                self.content.push_str(text)
-            }
-            fn request_review(self) -> PendingReviewPost {
-                PendingReviewPost {
-                    content: self.content,
-                }
-            }
-        }
-        impl PendingReviewPost {
-            fn approve(self) -> Post {
-                Post {
-                    content: self.content,
-                }
-            }
-        }
-        let mut post = Post::new();
-        let content = "hello world!";
-        post.add_text(content);
+
+        // 2.草稿ができたら、査読が要求される。
+        let post = Post::new();
         let post = post.request_review();
-        let post = post.approve();
-        assert_eq!(content, post.content());
-        // その後、以下の要件を満たしてみる
-        // - 記事の状態をPendingReviewからDraftに戻すrejectメソッドを追加する。
-        // - 状態がPublishedに変化させられる前にapproveを2回呼び出す必要があるようにする。
-        // - 記事がDraft状態の時のみテキスト内容をユーザが追加できるようにする。
+        assert_eq!(
+            "little_rustacean::tests::test_blog_not_oop::PendingReviewPost",
+            type_name_of_val(&post)
+        );
+
+        // 3.記事が承認されたら、公開される。
+        let mut post = Post::new();
+        let content = "hello not oop!";
+        post.add_text(content);
+        let mut post = post.request_review();
+        post.approve();
+        /*         assert_eq!(
+                   "little_rustacean::tests::test_blog_not_oop::PublishedPost",
+                   type_name_of_val(&post)
+               );
+        */
+        //assert_eq!( content, post.content() );
+
+        // 4.公開されたブログ記事だけが表示する内容を返すので、未承認の記事は、誤って公開されない。
+        // let draft = Post::new();
+        // Compile Error!!: post.content();
+        // let pending_review = draft.request_review();
+        // Compile Error!!: pending_review.content();
+
+        // 5.記事の状態をPendingReviewからDraftに戻すrejectメソッドを追加する。
+        let draft = Post::new();
+        let pending_review = draft.request_review();
+        let draft = pending_review.reject();
+        assert_eq!(
+            "little_rustacean::tests::test_blog_not_oop::DraftPost",
+            type_name_of_val(&draft)
+        );
+
+        // 6.状態がPublishedに変化させられる前にapproveを2回呼び出す必要があるようにする。
+        let mut draft = Post::new();
+        let content = "hello not oop in rust!";
+        draft.add_text(content);
+        let mut pending_review = draft.request_review();
+        pending_review.approve();
+        assert_eq!(
+            "little_rustacean::tests::test_blog_not_oop::PendingReviewPost",
+            type_name_of_val(&pending_review)
+        );
+        if let Some(published) = pending_review.approve() {
+            assert_eq!(content, published.content());
+        }
+
+        // 7.記事がDraft状態の時のみテキスト内容をユーザが追加できるようにする。
         //   ヒント: ステートオブジェクトに内容について変わる可能性のあるものの責任を持たせつつも、 Postを変更することには責任を持たせない。
+        let mut draft = Post::new();
+        draft.add_text("foo");
+        let mut pending_review = draft.request_review();
+        // Compile Error!!: pending_review.add_text("foo");
+        pending_review.approve();
+        let _published = pending_review.approve();
+        // Compile Error!!: published.add_text("foo");
     }
 }
