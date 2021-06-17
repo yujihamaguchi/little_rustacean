@@ -1,4 +1,6 @@
 #![feature(type_name_of_val)]
+#![allow(dead_code)]
+
 pub mod helper;
 
 use core::panic;
@@ -29,7 +31,6 @@ fn my_sum(ns: &[usize]) -> usize {
  */
 
 // 0020. Write a function named 'my_mean' to calculate an average for array of some numbers.
-#[allow(dead_code)]
 fn my_mean(ns: &[usize]) -> Option<usize> {
     match ns.len() {
         0 => None,
@@ -38,7 +39,6 @@ fn my_mean(ns: &[usize]) -> Option<usize> {
 }
 
 // 0025. Write a function named 'my_sort' to sort array of some numbers.
-#[allow(dead_code)]
 fn my_sort(ns: &[usize]) -> Vec<usize> {
     match ns {
         [] => vec![],
@@ -52,7 +52,6 @@ fn my_sort(ns: &[usize]) -> Vec<usize> {
 }
 
 // 0030. Write a function nemed 'my_median' to calculate a median for list of some numbers.
-#[allow(dead_code)]
 fn my_median(ns: &mut [usize]) -> Option<usize> {
     match ns.len() {
         0 => None,
@@ -64,18 +63,10 @@ fn my_median(ns: &mut [usize]) -> Option<usize> {
 }
 
 // 0031. go to test_blog_oop
-// 0032. go to test_blog_not_oop
-// その後、状態とふるまいを型としてコード化する()
-// 要件
-// 1.ブログ記事は、空の草稿から始まる。
-// 2.草稿ができたら、査読が要求される。
-// 3.記事が承認されたら、公開される。
-// 4.公開されたブログ記事だけが表示する内容を返すので、未承認の記事は、誤って公開されない。
 
-// その後、このバージョンで追加要件を実現してみる
+// 0032. go to test_blog_not_oop
 
 // 0040. Write a function named my_mode calclating the mode of elements of list.
-#[allow(dead_code)]
 fn my_mode(ns: &[usize]) -> Option<usize> {
     if ns.is_empty() {
         None
@@ -93,7 +84,6 @@ fn my_mode(ns: &[usize]) -> Option<usize> {
 }
 
 // 0050. Write a function named to_pig_latin converting word to Pig Latin word.
-#[allow(dead_code)]
 fn pig_latin_from(s: &str) -> String {
     match s.chars().nth(0) {
         Some('a') | Some('e') | Some('i') | Some('u') | Some('o') => format!("{}-hay", s),
@@ -103,7 +93,6 @@ fn pig_latin_from(s: &str) -> String {
 }
 
 // 0060. Write a function named `first_word` returning first word of string passed as parameter.
-#[allow(dead_code)]
 fn first_word(s: &str) -> Option<&str> {
     if s.is_empty() {
         None
@@ -128,7 +117,6 @@ fn first_word(s: &str) -> &str {
 */
 
 // 0070. Write a function named `largest_for_copy` returning largest one of elements which implements Copy trait.
-#[allow(dead_code)]
 fn largest_for_copy<T: PartialOrd + Copy>(list: &[T]) -> Option<T> {
     if list.is_empty() {
         None
@@ -144,7 +132,6 @@ fn largest_for_copy<T: PartialOrd + Copy>(list: &[T]) -> Option<T> {
 }
 
 // 0080. Write a function named `largest_for_clone` returning largest one of elements which implements Clone trait.
-#[allow(dead_code)]
 fn largest_for_clone<T: PartialOrd + Clone>(list: &[T]) -> Option<T> {
     if list.is_empty() {
         None
@@ -161,7 +148,6 @@ fn largest_for_clone<T: PartialOrd + Clone>(list: &[T]) -> Option<T> {
 }
 
 // 0090. Write a function named `largest` returning largest one of elements.
-#[allow(dead_code)]
 fn largest<T: PartialOrd>(list: &[T]) -> Option<&T> {
     if list.is_empty() {
         None
@@ -217,7 +203,6 @@ fn main() {
 // 0100. The Book: Ch.13.1 Closures: Anonymous Functions that Can Capture Their Environment
 /*
 // Before tuning.
-#[allow(dead_code)]
 fn generate_workout(intensity: u32, random_number: u32) {
     fn simulated_expensive_calculation(intensity: u32) -> u32 {
         println!("calculating slowly...");
@@ -248,7 +233,6 @@ fn generate_workout(intensity: u32, random_number: u32) {
 }
 */
 
-#[allow(dead_code)]
 fn generate_workout(intensity: u32, random_number: u32) {
     fn simulated_expensive_calculation(intensity: u32) -> u32 {
         println!("calculating slowly...");
@@ -303,7 +287,6 @@ where
 
 // Cacher実装の限界
 // 0110. 単独の値ではなく、ハッシュマップを保持するようにCacherを改変してみてください。
-#[allow(dead_code)]
 struct Cacher2<T>
 where
     T: Fn(u32) -> u32,
@@ -312,7 +295,6 @@ where
     value: HashMap<u32, u32>,
 }
 
-#[allow(dead_code)]
 impl<T> Cacher2<T>
 where
     T: Fn(u32) -> u32,
@@ -332,7 +314,6 @@ where
 // 0112. 現在のCacher実装の2番目の問題は、引数の型にu32を一つ取り、u32を返すクロージャしか受け付けないことです。
 //       例えば、文字列スライスを取り、usizeを返すクロージャの結果をキャッシュしたくなるかもしれません。
 //       この問題を修正するには、Cacher機能の柔軟性を向上させるためによりジェネリックな引数を導入してみてください。
-#[allow(dead_code)]
 struct Cacher3<T, U>
 where
     T: Fn(U) -> U,
@@ -341,7 +322,6 @@ where
     value: HashMap<U, U>,
 }
 
-#[allow(dead_code)]
 impl<T, U> Cacher3<T, U>
 where
     T: Fn(U) -> U,
@@ -360,19 +340,16 @@ where
 }
 
 // 0120. 絶対に1から5をカウントするだけのイテレータを作成しましょう。
-#[allow(dead_code)]
 struct Counter {
     count: u32,
 }
 
-#[allow(dead_code)]
 impl Counter {
     fn new() -> Self {
         Counter { count: 0 }
     }
 }
 
-#[allow(dead_code)]
 impl Iterator for Counter {
     type Item = u32;
 
@@ -697,8 +674,7 @@ mod tests {
             "little_rustacean::tests::test_blog_not_oop::DraftPost",
             type_name_of_val(&post)
         );
-        #[allow(dead_code)]
-        struct Post {
+                struct Post {
             content: String,
         }
         impl Post {
