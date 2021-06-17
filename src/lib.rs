@@ -3,7 +3,7 @@
 
 pub mod helper;
 
-use core::panic;
+use core::{panic, slice};
 use std::{collections::HashMap, thread, time::Duration, u32};
 
 // 0010. Write a function named `my_sum` summing array of usize elements.
@@ -362,15 +362,44 @@ impl Iterator for Counter {
     }
 }
 
+// 0130. Write the function named `my_split_at_mut` as [i32]'s method which will split a mutable slice(self) to two mutable slices at a passed index.
+trait MySlice {
+    fn my_split_at_mut(&mut self, _: usize) -> (&mut [i32], &mut [i32]);
+}
+impl MySlice for [i32] {
+    fn my_split_at_mut(&mut self, n: usize) -> (&mut [i32], &mut [i32]) {
+        let len = self.len();
+        let ptr = self.as_mut_ptr();
+        unsafe {
+            (
+                slice::from_raw_parts_mut(ptr, n),
+                slice::from_raw_parts_mut(ptr.offset(n as isize), len - n),
+            )
+        }
+    }
+}
+
 // Genbade yakudatsu ch.2
 
 #[cfg(test)]
-
 mod tests {
 
     use std::any::type_name_of_val;
 
     use super::*;
+
+    #[test]
+    fn test_my_split_at_mut() {
+        let mut v = vec![1, 2, 3, 4, 5, 6];
+
+        let r = &mut v[..];
+
+        let (a, b) = r.my_split_at_mut(3);
+
+        assert_eq!(a, &mut [1, 2, 3]);
+        assert_eq!(b, &mut [4, 5, 6]);
+    }
+
     #[test]
     fn test_my_sum() {
         assert_eq!(0, my_sum(&[]));
@@ -674,7 +703,7 @@ mod tests {
             "little_rustacean::tests::test_blog_not_oop::DraftPost",
             type_name_of_val(&post)
         );
-                struct Post {
+        struct Post {
             content: String,
         }
         impl Post {
