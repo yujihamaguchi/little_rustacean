@@ -821,4 +821,21 @@ mod tests {
         let _published = pending_review.approve();
         // Compile Error!!: published.add_text("foo");
     }
+    #[test]
+    fn test() {
+        trait MyIterator {
+            type Item;
+            fn next(&mut self) -> Option<Self::Item>;
+        }
+        struct Counter {}
+        impl MyIterator for Counter {
+            type Item = i32;
+
+            fn next(&mut self) -> Option<Self::Item> {
+                todo!()
+            }
+        }
+        
+        assert!(true);
+    }
 }
