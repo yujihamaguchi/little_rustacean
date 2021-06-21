@@ -83,12 +83,38 @@ fn my_mode(ns: &[usize]) -> Option<usize> {
     }
 }
 
-// 0050. Write a function named to_pig_latin converting word to Pig Latin word.
-fn pig_latin_from(s: &str) -> String {
-    match s.chars().nth(0) {
-        Some('a') | Some('e') | Some('i') | Some('u') | Some('o') => format!("{}-hay", s),
-        Some(c) => format!("{}-{}ay", s.chars().skip(1).collect::<String>(), c),
-        None => s.to_string(),
+// 0050. Write a function named `pig_latin_from` to convert word into Pig Latin fashion.
+enum Vowel {
+    A,
+    E,
+    U,
+    I,
+    O,
+}
+impl Vowel {
+    fn value(&self) -> char {
+        match *self {
+            Vowel::A => 'a',
+            Vowel::E => 'e',
+            Vowel::U => 'u',
+            Vowel::I => 'i',
+            Vowel::O => 'o',
+        }
+    }
+    fn contains(c: &char) -> bool {
+        c.eq(&Vowel::A.value())
+            || c.eq(&Vowel::E.value())
+            || c.eq(&Vowel::U.value())
+            || c.eq(&Vowel::I.value())
+            || c.eq(&Vowel::O.value())
+    }
+}
+
+fn pig_latin_from(word: &str) -> String {
+    match word.chars().nth(0) {
+        Some(c) if Vowel::contains(&c) => format!("{}-hay", word),
+        Some(c) => format!("{}-{}ay", word.chars().skip(1).collect::<String>(), c),
+        _ => word.to_string(),
     }
 }
 
@@ -835,7 +861,7 @@ mod tests {
                 todo!()
             }
         }
-        
+
         assert!(true);
     }
 }
