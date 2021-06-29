@@ -3,7 +3,7 @@
 
 pub mod helper;
 
-use core::{panic, slice};
+use core::slice;
 use std::{collections::HashMap, thread, time::Duration, u32};
 
 // 0010. Write a function named `my_sum` summing array of usize elements.
@@ -118,29 +118,18 @@ fn pig_latin_from(word: &str) -> String {
     }
 }
 
-// 0060. Write a function named `first_word` returning first word of string passed as parameter.
+// 0060. Write a function named `first_word` to return first word of string passed as parameter.
 fn first_word(s: &str) -> Option<&str> {
     if s.is_empty() {
-        None
-    } else {
-        match s.split(' ').collect::<Vec<_>>().as_slice() {
-            [first, _rest @ ..] => Some(first),
-            _ => panic!("unexpected pattern!"),
+        return None;
+    }
+    for (i, &c) in s.as_bytes().iter().enumerate() {
+        if b' ' == c {
+            return Some(&s[0..i]);
         }
     }
+    Some(s)
 }
-
-/*
-fn first_word(s: &str) -> &str {
-    let bytes = s.as_bytes();
-    for (i, &item) in bytes.iter().enumerate() {
-        if item == b' ' {
-            return &s[0..i];
-        }
-    }
-    &s[..]
-}
-*/
 
 // 0070. Write a function named `largest_for_copy` returning largest one of elements which implements Copy trait.
 fn largest_for_copy<T: PartialOrd + Copy>(list: &[T]) -> Option<T> {
@@ -472,7 +461,7 @@ mod tests {
     fn test_first_word() {
         assert_eq!(None, first_word(""));
         assert_eq!(Some("foo"), first_word("foo"));
-        assert_eq!(Some("foo"), first_word("foo bar baz"));
+        assert_eq!(Some("bar"), first_word("bar baz foo"));
     }
 
     #[test]
