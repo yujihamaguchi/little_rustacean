@@ -123,9 +123,9 @@ fn first_word(s: &str) -> Option<&str> {
     if s.is_empty() {
         return None;
     }
-    for (i, &c) in s.as_bytes().iter().enumerate() {
+    for (i, c) in s.bytes().enumerate() {
         if b' ' == c {
-            return Some(&s[0..i]);
+            return Some(&s[..i]);
         }
     }
     Some(s)
