@@ -132,7 +132,8 @@ fn first_word(s: &str) -> Option<&str> {
 }
 
 // 0070. Write a function named `largest_for_copy` returning largest one of elements which implements Copy trait.
-fn largest_for_copy<T: PartialOrd + Copy>(list: &[T]) -> Option<T> {
+// use for loop
+fn largest_for_copy<T: Ord + Copy>(list: &[T]) -> Option<T> {
     if list.is_empty() {
         None
     } else {
@@ -145,6 +146,14 @@ fn largest_for_copy<T: PartialOrd + Copy>(list: &[T]) -> Option<T> {
         Some(largest)
     }
 }
+
+// use reduce
+/* fn largest_for_copy<T: Copy + Ord>(xs: &[T]) -> Option<T> {
+    xs.to_owned()
+        .into_iter()
+        .reduce(|x, y| if x > y { x } else { y })
+}
+ */
 
 // 0080. Write a function named `largest_for_clone` returning largest one of elements which implements Clone trait.
 fn largest_for_clone<T: PartialOrd + Clone>(list: &[T]) -> Option<T> {
