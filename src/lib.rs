@@ -172,18 +172,17 @@ fn largest_for_clone<T: PartialOrd + Clone>(list: &[T]) -> Option<T> {
 }
 
 // 0090. Write a function named `largest` returning largest one of elements.
-fn largest<T: PartialOrd>(list: &[T]) -> Option<&T> {
-    if list.is_empty() {
-        None
-    } else {
-        let mut largest = &list[0];
-        for item in list.iter() {
-            if item > largest {
-                largest = item;
-            }
-        }
-        Some(largest)
+fn largest<T: PartialOrd>(xs: &[T]) -> Option<&T> {
+    if xs.is_empty() {
+        return None;
     }
+    let mut largest = &xs[0];
+    for x in xs {
+        if largest < x {
+            largest = x;
+        }
+    }
+    Some(largest)
 }
 
 // 0095. The Book: Ch12. An I/O Project: Building a Command Line Program
