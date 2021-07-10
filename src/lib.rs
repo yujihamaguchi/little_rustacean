@@ -191,33 +191,36 @@ fn largest<T: PartialOrd>(xs: &[T]) -> Option<&T> {
 // それからユーザに、ある部署にいる人間の一覧や部署ごとにアルファベット順で並べ替えられた会社の全人間の一覧を扱わせてあげてください。
 /*
 use std::{collections::HashMap, io};
-
 fn main() {
-    let mut depts: HashMap<String, Vec<String>> = HashMap::new();
+    let mut org: HashMap<String, Vec<String>> = HashMap::new();
     loop {
-        println!("Command?");
-
         let mut command = String::new();
         io::stdin()
             .read_line(&mut command)
             .expect("Failed to read line!");
-
         match command.trim().split(' ').collect::<Vec<_>>().as_slice() {
-            ["add", name, "to", dept] => {
-                depts
-                    .entry(dept.to_string())
+            &["Add", name, "to", dept] => {
+                org.entry(String::from(dept))
                     .or_insert(Vec::new())
-                    .push(name.to_string());
+                    .push(String::from(name));
             }
-            ["list"] => list(&depts),
-            ["list", target_dept] => list(
-                &depts
-                    .iter()
-                    .filter(|(dept, _)| dept == target_dept)
-                    .map(|(k, v)| (k.clone(), v.clone()))
-                    .collect::<HashMap<_, _>>(),
-            ),
-            _ => println!("nothing to do!"),
+            &["list", dept] => {
+                if let Some(names) = org.get(dept) {
+                    for name in names {
+                        println!("{}", name);
+                    }
+                }
+            }
+            &["list"] => {
+                for (dept, names) in &org {
+                    let mut names = names.clone();
+                    names.sort();
+                    for name in names {
+                        println!("{} {}", dept, name);
+                    }
+                }
+            }
+            _ => println!("Invalid command!"),
         }
     }
 }
