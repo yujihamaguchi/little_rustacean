@@ -227,6 +227,71 @@ fn main() {
 */
 
 // 0100. The Book: Ch.13.1 Closures: Anonymous Functions that Can Capture Their Environment
+// 最初は単独のキーのみ保持するキャッシュでよい
+// このあたりやり方を整理する
+fn generate_workout(intensity: u32, random_number: u32) {
+    struct Cacher<T>
+    where T: Fn(u32) -> u32 {
+        calc: T,
+        value: Option<u32>,
+    }
+    impl<T> Cacher<T>
+    where T: Fn(u32) -> u32 {
+        pub fn new(calc: T) -> Self {
+            Cacher {
+                calc,
+                value: None,
+            }
+        }
+        pub fn value(&mut self, key: u32) -> u32 {
+            match self.value {
+                Some(v) => v,
+                None => {
+                    let value = (self.calc)(key);
+                    self.value = Some(value);
+                    value
+                }
+            }
+        }
+    }
+    let simulated_expensive_calculation = |intensity: u32| {
+        println!("calculating slowly...");
+        thread::sleep(Duration::from_secs(2));
+        intensity
+    };
+    let mut cacher = Cacher::new(simulated_expensive_calculation);
+   // let result = simulated_expensive_calculation(intensity);
+    if intensity < 25 {
+        println!(
+            "Today, do {} pushups!",
+            // simulated_expensive_calculation(intensity)
+            // result
+            // simulated_expensive_calculation()
+            cacher.value(intensity)
+        );
+
+        println!(
+            "Next, do {} situps!",
+            // simulated_expensive_calculation(intensity)
+            // result
+            //simulated_expensive_calculation()
+            cacher.value(intensity)
+        );
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!(
+                "Today, run for {} minutes!",
+                // simulated_expensive_calculation(intensity)
+                // result
+                // simulated_expensive_calculation()
+                cacher.value(intensity)
+            );
+        }
+    }
+}
+
 /*
 // Before tuning.
 fn generate_workout(intensity: u32, random_number: u32) {
@@ -258,7 +323,7 @@ fn generate_workout(intensity: u32, random_number: u32) {
     }
 }
 */
-
+/*
 fn generate_workout(intensity: u32, random_number: u32) {
     fn simulated_expensive_calculation(intensity: u32) -> u32 {
         println!("calculating slowly...");
@@ -310,7 +375,7 @@ where
         }
     }
 }
-
+*/
 // Cacher実装の限界
 // 0110. 単独の値ではなく、ハッシュマップを保持するようにCacherを改変してみてください。
 struct Cacher2<T>
@@ -510,10 +575,9 @@ mod tests {
 
     #[test]
     fn test_list_workout_in_specific_secs() {
-        /*         assert_eq!(2, helper::execution_seconds(|| generate_workout(24, 0)));
-               assert_eq!(2, helper::execution_seconds(|| generate_workout(25, 0)));
-               assert_eq!(0, helper::execution_seconds(|| generate_workout(25, 3)));
-        */
+        assert_eq!(2, helper::execution_seconds(|| generate_workout(25, 0)));
+        assert_eq!(0, helper::execution_seconds(|| generate_workout(25, 3)));
+        assert_eq!(2, helper::execution_seconds(|| generate_workout(24, 0)));        
     }
 
     #[test]
