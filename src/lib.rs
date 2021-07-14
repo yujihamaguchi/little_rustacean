@@ -259,65 +259,18 @@ fn generate_workout(intensity: u32, random_number: u32) {
     }
 }
 */
-
 fn simulated_expensive_calculation(intensity: u32) -> u32 {
     println!("calculating slowly...");
     thread::sleep(Duration::from_secs(2));
     intensity
 }
 
-fn generate_workout(intensity: u32, random_number: u32) {
-    struct Cacher<T>
-    where T: Fn(u32) -> u32 {
-        calc: T,
-        value: Option<u32>,
-    }
-    impl<T> Cacher<T>
-    where T: Fn(u32) -> u32 {
-        pub fn new(calc: T) -> Self {
-            Cacher {
-                calc,
-                value: None,
-            }
-        }
-        pub fn value(&mut self, key: u32) -> u32 {
-            match self.value {
-                Some(v) => v,
-                None => {
-                    let value = (self.calc)(key);
-                    self.value = Some(value);
-                    value
-                }
-            }
-        }
-    }
-    let mut cacher = Cacher::new(|intensity: u32| simulated_expensive_calculation(intensity));
-    if intensity < 25 {
-        println!("Today, do {} pushups!", &cacher.value(intensity));
-
-        println!("Next, do {} situps!", &cacher.value(intensity));
-    } else {
-        if random_number == 3 {
-            println!("Take a break today! Remember to stay hydrated!");
-        } else {
-            println!("Today, run for {} minutes!", &cacher.value(intensity));
-        }
-    }
-}
-
-/*
-fn generate_workout(intensity: u32, random_number: u32) {
-    fn simulated_expensive_calculation(intensity: u32) -> u32 {
-        println!("calculating slowly...");
-        thread::sleep(Duration::from_secs(2));
-        intensity
-    }
-
-    let mut cacher = Cacher::new(|_| simulated_expensive_calculation(intensity));
-
+fn execute<T>(intensity: u32, random_number: u32, cacher: &mut Cacher<T>)
+where
+    T: Fn(u32) -> u32,
+{
     if intensity < 25 {
         println!("Today, do {} pushups!", cacher.value(intensity));
-
         println!("Next, do {} situps!", cacher.value(intensity));
     } else {
         if random_number == 3 {
@@ -328,36 +281,40 @@ fn generate_workout(intensity: u32, random_number: u32) {
     }
 }
 
+fn generate_workout(intensity: u32, random_number: u32) {
+    let mut cacher = Cacher::new(|intensity: u32| simulated_expensive_calculation(intensity));
+    execute(intensity, random_number, &mut cacher);
+}
+// TODO: このトレイトを使う
+trait Cacherable<T, U> {
+    fn value(&mut self, key: U) -> U;
+}
 struct Cacher<T>
 where
     T: Fn(u32) -> u32,
 {
-    calculation: T,
+    calc: T,
     value: Option<u32>,
 }
-
 impl<T> Cacher<T>
 where
     T: Fn(u32) -> u32,
 {
-    fn new(calculation: T) -> Cacher<T> {
-        Cacher {
-            calculation,
-            value: None,
-        }
+    pub fn new(calc: T) -> Self {
+        Cacher { calc, value: None }
     }
-    fn value(&mut self, v: u32) -> u32 {
+    pub fn value(&mut self, key: u32) -> u32 {
         match self.value {
             Some(v) => v,
             None => {
-                let v = (self.calculation)(v);
-                self.value = Some(v);
-                v
+                let value = (self.calc)(key);
+                self.value = Some(value);
+                value
             }
         }
     }
 }
-*/
+
 // Cacher実装の限界
 // 0110. 単独の値ではなく、ハッシュマップを保持するようにCacherを改変してみてください。
 struct Cacher2<T>
