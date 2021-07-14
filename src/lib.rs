@@ -285,9 +285,8 @@ fn generate_workout(intensity: u32, random_number: u32) {
     let mut cacher = Cacher::new(|intensity: u32| simulated_expensive_calculation(intensity));
     execute(intensity, random_number, &mut cacher);
 }
-// TODO: このトレイトを使う
-trait Cacherable<T, U> {
-    fn value(&mut self, key: U) -> U;
+trait Cached<T> {
+    fn value(&mut self, key: T) -> T;
 }
 struct Cacher<T>
 where
@@ -303,7 +302,13 @@ where
     pub fn new(calc: T) -> Self {
         Cacher { calc, value: None }
     }
-    pub fn value(&mut self, key: u32) -> u32 {
+}
+
+impl<T> Cached<u32> for Cacher<T>
+where
+    T: Fn(u32) -> u32,
+{
+    fn value(&mut self, key: u32) -> u32 {
         match self.value {
             Some(v) => v,
             None => {
