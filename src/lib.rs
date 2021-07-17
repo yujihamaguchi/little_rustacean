@@ -265,25 +265,24 @@ fn simulated_expensive_calculation(intensity: u32) -> u32 {
     intensity
 }
 
-fn execute<T>(intensity: u32, random_number: u32, cacher: &mut Cacher<T>)
-where
-    T: Fn(u32) -> u32,
-{
+fn execute(intensity: u32, random_number: u32, cacher: &mut dyn Cached<u32>) -> u32 {
+    let mut result: u32 = 0;
     if intensity < 25 {
-        println!("Today, do {} pushups!", cacher.value(intensity));
-        println!("Next, do {} situps!", cacher.value(intensity));
+        cacher.value(intensity);
+        result = cacher.value(intensity + 1);
     } else {
         if random_number == 3 {
             println!("Take a break today! Remember to stay hydrated!");
         } else {
-            println!("Today, run for {} minutes!", cacher.value(intensity));
+            result = cacher.value(intensity);
         }
     }
+    result
 }
 
-fn generate_workout(intensity: u32, random_number: u32) {
+fn generate_workout(intensity: u32, random_number: u32) -> u32 {
     let mut cacher = Cacher::new(|intensity: u32| simulated_expensive_calculation(intensity));
-    execute(intensity, random_number, &mut cacher);
+    execute(intensity, random_number, &mut cacher)
 }
 trait Cached<T> {
     fn value(&mut self, key: T) -> T;
@@ -322,11 +321,16 @@ where
 
 // Cacher実装の限界
 // 0110. 単独の値ではなく、ハッシュマップを保持するようにCacherを改変してみてください。
+fn generate_workout2(intensity: u32, random_number: u32) -> u32 {
+    let mut cacher = Cacher2::new(|intensity: u32| simulated_expensive_calculation(intensity));
+    execute(intensity, random_number, &mut cacher)
+}
+
 struct Cacher2<T>
 where
     T: Fn(u32) -> u32,
 {
-    calculation: T,
+    calc: T,
     value: HashMap<u32, u32>,
 }
 
@@ -334,15 +338,27 @@ impl<T> Cacher2<T>
 where
     T: Fn(u32) -> u32,
 {
-    fn new(calculation: T) -> Cacher2<T> {
+    fn new(calc: T) -> Self {
         Cacher2 {
-            calculation,
+            calc,
             value: HashMap::new(),
         }
     }
-    fn value(&mut self, v: u32) -> u32 {
-        self.value.entry(v).or_insert((self.calculation)(v));
-        self.value[&v]
+}
+
+impl<T> Cached<u32> for Cacher2<T>
+where
+    T: Fn(u32) -> u32,
+{
+    fn value(&mut self, key: u32) -> u32 {
+        match self.value.get(&key) {
+            Some(v) => *v,
+            None => {
+                let value = (self.calc)(key);
+                self.value.entry(key).or_insert(value);
+                value
+            }
+        }
     }
 }
 
@@ -519,9 +535,18 @@ mod tests {
 
     #[test]
     fn test_list_workout_in_specific_secs() {
-        assert_eq!(2, helper::execution_seconds(|| generate_workout(25, 0)));
+        assert_eq!(2, helper::execution_seconds(|| generate_workout(25, 1)));
         assert_eq!(0, helper::execution_seconds(|| generate_workout(25, 3)));
-        assert_eq!(2, helper::execution_seconds(|| generate_workout(24, 0)));
+        assert_eq!(24, generate_workout(24, 1));
+        assert_eq!(2, helper::execution_seconds(|| generate_workout(24, 1)));
+    }
+
+    #[test]
+    fn test_list_workout_in_specific_secs2() {
+        assert_eq!(2, helper::execution_seconds(|| generate_workout2(25, 1)));
+        assert_eq!(0, helper::execution_seconds(|| generate_workout2(25, 3)));
+        assert_eq!(25, generate_workout2(24, 1));
+        assert_eq!(4, helper::execution_seconds(|| generate_workout2(24, 1)));
     }
 
     #[test]

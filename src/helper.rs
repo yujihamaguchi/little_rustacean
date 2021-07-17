@@ -3,7 +3,7 @@ use std::time::SystemTime;
 #[allow(dead_code)]
 pub fn execution_seconds<F>(f: F) -> u64
 where
-    F: Fn() -> (),
+    F: Fn() -> u32,
 {
     let start = SystemTime::now();
     (f());
