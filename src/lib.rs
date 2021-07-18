@@ -430,6 +430,9 @@ impl MySlice for [i32] {
     }
 }
 
+// 1010. haskell の zip と同様の機能の関数 my-zip を書け （パラメータの数は可変であること）
+//       zip :: [a] -> [b] -> [(a, b)]
+
 // Genbade yakudatsu ch.2
 
 #[cfg(test)]
