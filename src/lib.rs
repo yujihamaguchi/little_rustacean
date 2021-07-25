@@ -446,6 +446,27 @@ fn my_zip<'a>(args: &'a [&[u32]]) -> Vec<(u32, u32)> {
     result
 }
 
+// 1020: haskell の sum と同様の機能の関数を書け。(再帰を用いるパターン, reduce を用いるパターン、apply を用いるパターン)
+// sum :: (Num a) => [a] -> a
+// sum ns
+//     数値のリスト ns の総和を返す。
+//     see also: product, foldl
+//         sum [1, 2, 3]  = 6
+//         sum []         = 0
+// using recursion.
+/* fn sum(ns: &[u32]) -> u32 {
+    if ns.is_empty() {
+        return 0;
+    }
+    ns[0] + sum(&ns[1..])
+}
+ */
+
+// using reduce.
+fn sum(ns: &[u32]) -> u32 {
+    ns.to_vec().into_iter().reduce(|acc, m| acc + m).unwrap_or(0)
+}
+
 // Genbade yakudatsu ch.2
 
 #[cfg(test)]
@@ -456,10 +477,17 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_sum() {
+        assert_eq!(0, sum(&[]));
+        assert_eq!(0, sum(&[0, 0]));
+        assert_eq!(1, sum(&[1]));
+        assert_eq!(10, sum(&[1, 2, 3, 4]));
+    }
+    #[test]
     fn test_my_zip() {
         assert_eq!(vec![(1, 2), (3, 4)], my_zip(&[&[1, 3], &[2, 4]]));
     }
-    
+
     #[test]
     fn test_my_split_at_mut() {
         let mut v = vec![1, 2, 3, 4, 5, 6];
