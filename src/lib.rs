@@ -446,14 +446,14 @@ fn my_zip<'a>(args: &'a [&[u32]]) -> Vec<(u32, u32)> {
     result
 }
 
-// 1020: haskell の sum と同様の機能の関数を書け。(再帰を用いるパターン, reduce を用いるパターン、apply を用いるパターン)
+// 1020: haskell の sum と同様の機能の関数を書け。(再帰を用いるパターン, reduce を用いるパターン)
 // sum :: (Num a) => [a] -> a
 // sum ns
 //     数値のリスト ns の総和を返す。
 //     see also: product, foldl
 //         sum [1, 2, 3]  = 6
 //         sum []         = 0
-// using recursion.
+// Using recursion.
 /* fn sum(ns: &[u32]) -> u32 {
     if ns.is_empty() {
         return 0;
@@ -462,9 +462,13 @@ fn my_zip<'a>(args: &'a [&[u32]]) -> Vec<(u32, u32)> {
 }
  */
 
-// using reduce.
+// Using reduce.
+// refer: https://stackoverflow.com/questions/34733811/what-is-the-difference-between-iter-and-into-iter
 fn sum(ns: &[u32]) -> u32 {
-    ns.to_vec().into_iter().reduce(|acc, m| acc + m).unwrap_or(0)
+     ns.to_vec()
+        .into_iter()
+        .reduce(|acc, m| acc + m)
+        .unwrap_or(0)
 }
 
 // Genbade yakudatsu ch.2
