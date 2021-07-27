@@ -465,9 +465,9 @@ fn my_zip<'a>(args: &'a [&[u32]]) -> Vec<(u32, u32)> {
 // Using reduce.
 // refer: https://stackoverflow.com/questions/34733811/what-is-the-difference-between-iter-and-into-iter
 fn sum(ns: &[u32]) -> u32 {
-     ns.to_vec()
+    ns.to_vec()
         .into_iter()
-        .reduce(|acc, m| acc + m)
+        .reduce(|acc, n| acc + n)
         .unwrap_or(0)
 }
 
