@@ -228,16 +228,16 @@ fn main() {
 
 // 0100. The Book: Ch.13.1 Closures: Anonymous Functions that Can Capture Their Environment
 // 最初は単独のキーのみ保持するキャッシュでよい
-/*
-// Before tuning.
-fn generate_workout(intensity: u32, random_number: u32) {
-    fn simulated_expensive_calculation(intensity: u32) -> u32 {
-        println!("calculating slowly...");
-        thread::sleep(Duration::from_secs(2));
-        intensity
-    }
-    if intensity < 25 {
 
+fn simulated_expensive_calculation(intensity: u32) -> u32 {
+    println!("calculating slowly...");
+    thread::sleep(Duration::from_secs(2));
+    intensity
+}
+
+// Before tuning.
+/* fn generate_workout(intensity: u32, random_number: u32) -> u32 {
+    if intensity < 25 {
         println!(
             "Today, do {} pushups!",
             simulated_expensive_calculation(intensity)
@@ -257,12 +257,65 @@ fn generate_workout(intensity: u32, random_number: u32) {
             );
         }
     }
+    intensity
 }
 */
-fn simulated_expensive_calculation(intensity: u32) -> u32 {
-    println!("calculating slowly...");
-    thread::sleep(Duration::from_secs(2));
+
+fn generate_workout(intensity: u32, random_number: u32) -> u32 {
+    let mut cacher = Cacher::new(|_| simulated_expensive_calculation(intensity));
+    if intensity < 25 {
+        println!("Today, do {} pushups!", cacher.value(intensity));
+
+        println!("Next, do {} situps!", cacher.value(intensity));
+    } else {
+        if random_number == 3 {
+            println!("Take a break today! Remember to stay hydrated!");
+        } else {
+            println!("Today, run for {} minutes!", cacher.value(intensity));
+        }
+    }
     intensity
+}
+
+struct Cacher<T>
+where
+    T: Fn(u32) -> u32,
+{
+    value: Option<u32>,
+    calc: T,
+}
+
+impl<T> Cacher<T>
+where
+    T: Fn(u32) -> u32,
+{
+    fn new(calc: T) -> Self {
+        Cacher { value: None, calc }
+    }
+}
+trait Cached<T> {
+    fn value(&mut self, key: T) -> T;
+}
+
+impl<T> Cached<u32> for Cacher<T>
+where
+    T: Fn(u32) -> u32,
+{
+    fn value(&mut self, key: u32) -> u32 {
+        match self.value {
+            Some(v) => v,
+            None => {
+                let value = (self.calc)(key);
+                self.value = Some(value);
+                value
+            }
+        }
+    }
+}
+/*
+fn generate_workout(intensity: u32, random_number: u32) -> u32 {
+    let mut cacher = Cacher::new(|intensity: u32| simulated_expensive_calculation(intensity));
+    execute(intensity, random_number, &mut cacher)
 }
 
 fn execute(intensity: u32, random_number: u32, cacher: &mut dyn Cached<u32>) -> u32 {
@@ -280,13 +333,10 @@ fn execute(intensity: u32, random_number: u32, cacher: &mut dyn Cached<u32>) -> 
     result
 }
 
-fn generate_workout(intensity: u32, random_number: u32) -> u32 {
-    let mut cacher = Cacher::new(|intensity: u32| simulated_expensive_calculation(intensity));
-    execute(intensity, random_number, &mut cacher)
-}
 trait Cached<T> {
     fn value(&mut self, key: T) -> T;
 }
+
 struct Cacher<T>
 where
     T: Fn(u32) -> u32,
@@ -318,9 +368,10 @@ where
         }
     }
 }
-
+*/
 // Cacher実装の限界
 // 0110. 単独の値ではなく、ハッシュマップを保持するようにCacherを改変してみてください。
+/*
 fn generate_workout2(intensity: u32, random_number: u32) -> u32 {
     let mut cacher = Cacher2::new(|intensity: u32| simulated_expensive_calculation(intensity));
     execute(intensity, random_number, &mut cacher)
@@ -361,6 +412,7 @@ where
         }
     }
 }
+*/
 
 // 0112. 現在のCacher実装の2番目の問題は、引数の型にu32を一つ取り、u32を返すクロージャしか受け付けないことです。
 //       例えば、文字列スライスを取り、usizeを返すクロージャの結果をキャッシュしたくなるかもしれません。
@@ -428,22 +480,6 @@ impl MySlice for [i32] {
             )
         }
     }
-}
-
-// 1010. haskell の zip と同様の機能の関数 my-zip を書け （パラメータの数は可変であること）
-//       zip :: [a] -> [b] -> [(a, b)]
-fn my_zip<'a>(args: &'a [&[u32]]) -> Vec<(u32, u32)> {
-    let mut min_length = 100;
-    for &arg in args {
-        if arg.len() < min_length {
-            min_length = arg.len();
-        }
-    }
-    let mut result = Vec::new();
-    for i in 0..min_length {
-        result.push((*args[0].get(i).unwrap(), *args[1].get(i).unwrap()));
-    }
-    result
 }
 
 // 1020: haskell の sum と同様の機能の関数を書け。(再帰を用いるパターン, reduce を用いるパターン)
@@ -586,14 +622,14 @@ mod tests {
         );
     }
 
-    /*     #[test]
-       fn test_list_workout_in_specific_secs() {
-           assert_eq!(2, helper::execution_seconds(|| generate_workout(25, 1)));
-           assert_eq!(0, helper::execution_seconds(|| generate_workout(25, 3)));
-           assert_eq!(24, generate_workout(24, 1));
-           assert_eq!(2, helper::execution_seconds(|| generate_workout(24, 1)));
-       }
-
+    #[test]
+    fn test_list_workout_in_specific_secs() {
+        assert_eq!(2, helper::execution_seconds(|| generate_workout(25, 1)));
+        assert_eq!(0, helper::execution_seconds(|| generate_workout(25, 3)));
+        assert_eq!(24, generate_workout(24, 1));
+        assert_eq!(2, helper::execution_seconds(|| generate_workout(24, 1)));
+    }
+    /*
        #[test]
        fn test_list_workout_in_specific_secs2() {
            assert_eq!(2, helper::execution_seconds(|| generate_workout2(25, 1)));
